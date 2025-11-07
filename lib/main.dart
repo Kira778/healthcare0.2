@@ -12,7 +12,6 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-// Entry
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(const SmartHealthStaticApp());
@@ -27,7 +26,7 @@ class SmartHealthStaticApp extends StatelessWidget {
       title: 'Smart Health Emergency System (Static Demo)',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        textTheme: GoogleFonts.cairoTextTheme(), // use Cairo Arabic-like font
+        textTheme: GoogleFonts.cairoTextTheme(), 
         primarySwatch: Colors.blue,
         scaffoldBackgroundColor: const Color(0xFFF6F8FB),
       ),
@@ -153,14 +152,13 @@ class HomePage extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            // -------- العنوان --------
             Row(
               children: [
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: 100, // ممكن تغيّر الحجم حسب الشكل اللي يناسبك
+                      width: 100,
                       height: 60,
                       child: Lottie.asset('assets/welcome.json'),
                     ),
@@ -178,7 +176,6 @@ class HomePage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // -------- كروت النبض والحرارة --------
             Row(
               children: [
                 Expanded(
@@ -205,7 +202,6 @@ class HomePage extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            // -------- ملخص الحالة --------
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(14),
@@ -247,7 +243,6 @@ class HomePage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // -------- عروض لوتي --------
             SizedBox(
               height: 200,
               child: Column(
@@ -291,7 +286,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  // ---------------- Widgets فرعية ----------------
 
   Widget _healthCard({
     required String title,
@@ -339,7 +333,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-// ---------------- Promo Card ----------------
 
 class _promoCard extends StatelessWidget {
   final String title;
