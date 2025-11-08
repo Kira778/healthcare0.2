@@ -1,39 +1,22 @@
-name: test_package_flutter
-description: "A new Flutter project."
+name: final_project
+description: A Smart Health Emergency System Flutter application
 publish_to: 'none'
-
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.7.2
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
-  get: ^4.6.6
-  lottie: ^3.1.2
-  octo_image: ^2.0.0
-  google_fonts: ^6.2.1
-  flutter_animate: ^4.5.0
-  smooth_page_indicator: ^1.2.0+3
-  fl_chart: ^0.68.0
-  font_awesome_flutter: ^10.7.0
-  awesome_dialog: ^3.2.1
-  flutter_switch: ^0.3.2
-  intl: ^0.19.0
-  shared_preferences: ^2.3.3
-  url_launcher: ^6.3.0
-  cupertino_icons: ^1.0.8
+  provider: ^6.1.1
+  shared_preferences: ^2.2.2
+  # تم إزالة fl_chart
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0
+  flutter_lints: ^3.0.0
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/selected.json
-    - assets/FreezingEYES.json
-    - assets/welcome.json
-    - assets/heartBeatPulse.json
