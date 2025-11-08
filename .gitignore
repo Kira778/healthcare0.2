@@ -1,0 +1,18 @@
+# Flutter & Dart
+.dart_tool/
+.packages
+.pub-cache/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Android
+*.iml
+*.apk
+*.aar
+local.properties
+.gradle/
+
+# iOS
+Pods/
+DerivedData/
