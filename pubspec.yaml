@@ -7,10 +7,21 @@ environment:
   sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
+  awesome_dialog: ^3.3.0
+  fl_chart: ^0.70.0
   flutter:
     sdk: flutter
+  flutter_animate: ^4.5.2
+  flutter_switch: ^0.3.2
+  font_awesome_flutter: ^10.9.1
+  get: ^4.7.2
+  google_fonts: ^6.3.2
+  intl: ^0.20.2
+  lottie: ^3.3.1
   provider: ^6.1.1
   shared_preferences: ^2.2.2
+  smooth_page_indicator: ^1.2.1
+  url_launcher: ^6.3.2
   # تم إزالة fl_chart
 
 dev_dependencies:
@@ -20,3 +31,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+  - assets/
