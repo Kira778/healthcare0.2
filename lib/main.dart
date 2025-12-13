@@ -1,27 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'screens/main_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'presentation/screens/login/login_screen.dart';
+import 'presentation/screens/main_layout.dart';
+import 'core/auth/auth_gate.dart';
 
-void main() {
+
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const SmartHealthStaticApp());
+
+  await Supabase.initialize(
+    url: 'https://feoosyjnxwlebkxojrys.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZlb29zeWpueHdsZWJreG9qcnlzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU1NjAzMzQsImV4cCI6MjA4MTEzNjMzNH0.PaF7UN1_zN5CHWRVjE5l_2SlZI7KXh5_lUXgMsGlA9I',
+  );
+
+  runApp(MyApp());
 }
 
-class SmartHealthStaticApp extends StatelessWidget {
-  const SmartHealthStaticApp({super.key});
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
-      title: 'Smart Health Emergency System (Static Demo)',
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        textTheme: GoogleFonts.cairoTextTheme(),
-        primarySwatch: Colors.blue,
-        scaffoldBackgroundColor: const Color(0xFFF6F8FB),
-      ),
-      home: const MainScreen(),
+      home: AuthGate(),
     );
   }
 }
