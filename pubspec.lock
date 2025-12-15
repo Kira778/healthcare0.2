@@ -131,6 +131,7 @@ packages:
     version: "3.0.7"
   cupertino_icons:
     dependency: "direct main"
+<<<<<<< HEAD
     description:
       name: cupertino_icons
       sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
@@ -155,12 +156,30 @@ packages:
     version: "0.3.1"
   equatable:
     dependency: transitive
+=======
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
     description:
-      name: equatable
-      sha256: "567c64b3cb4cf82397aac55f4f0cbd3ca20d77c6c03bedbc4ceaddc08904aef7"
+      name: cupertino_icons
+      sha256: ba631d1c7f7bef6b729a622b7b752645a2d076dba9976925b8f25725a30e1ee6
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.7"
+    version: "1.0.8"
+  dart_jsonwebtoken:
+    dependency: transitive
+    description:
+      name: dart_jsonwebtoken
+      sha256: "0de65691c1d736e9459f22f654ddd6fd8368a271d4e41aa07e53e6301eff5075"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.1"
+  ed25519_edwards:
+    dependency: transitive
+    description:
+      name: ed25519_edwards
+      sha256: "6ce0112d131327ec6d42beede1e5dfd526069b18ad45dcf654f15074ad9276cd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.1"
   fake_async:
     dependency: transitive
     description:
@@ -187,6 +206,7 @@ packages:
     version: "7.0.1"
   fixnum:
     dependency: transitive
+<<<<<<< HEAD
     description:
       name: fixnum
       sha256: b6dc7065e46c974bc7c5f143080a6764ec7a4be6da1285ececdc37be96de53be
@@ -201,6 +221,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.66.2"
+=======
+    description:
+      name: fixnum
+      sha256: b6dc7065e46c974bc7c5f143080a6764ec7a4be6da1285ececdc37be96de53be
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
   flutter:
     dependency: "direct main"
     description: flutter
@@ -359,7 +387,11 @@ packages:
       sha256: "23f08335362185a5ea2ad3a4e597f1375e78bce8a040df5c600c8d3552ef2394"
       url: "https://pub.dev"
     source: hosted
+<<<<<<< HEAD
     version: "1.17.0"
+=======
+    version: "1.16.0"
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
   mime:
     dependency: transitive
     description:
@@ -625,10 +657,17 @@ packages:
     dependency: transitive
     description:
       name: test_api
+<<<<<<< HEAD
       sha256: ab2726c1a94d3176a45960b6234466ec367179b87dd74f1611adb1f3b5fb9d55
       url: "https://pub.dev"
     source: hosted
     version: "0.7.7"
+=======
+      sha256: "522f00f556e73044315fa4585ec3270f1808a4b186c936e612cab0b565ff1e00"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.6"
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
   typed_data:
     dependency: transitive
     description:

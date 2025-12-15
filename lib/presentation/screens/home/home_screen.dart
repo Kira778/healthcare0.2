@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+<<<<<<< HEAD
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'dart:async';
 import 'dart:math';
+=======
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
 
 class HomeScreen extends StatefulWidget {
   final String? userName;
@@ -15,6 +18,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+<<<<<<< HEAD
   final SupabaseClient supabase = Supabase.instance.client;
   bool _loading = true;
   bool _usingRealData = false;
@@ -25,10 +29,21 @@ class _HomeScreenState extends State<HomeScreen> {
   double _bloodPressure = 120.0;
   double _oxygenLevel = 98.0;
   double _temperature = 36.8;
+=======
+  bool _loading = true;
+  double _heartRate = 72.0;
+  double _bloodPressure = 120.0;
+  double _oxygenLevel = 98.0;
+  double _temperature = 36.8;
+
+  // 🔹 بيانات الجرافات المصغرة
+  List<double> _heartRateHistory = [];
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
   List<double> _bloodPressureHistory = [];
   List<double> _oxygenHistory = [];
   List<double> _temperatureHistory = [];
 
+<<<<<<< HEAD
   int? _deviceSerialNumber; // ⭐️ تغيير من String? إلى int?
   late Timer _updateTimer;
 
@@ -197,10 +212,47 @@ class _HomeScreenState extends State<HomeScreen> {
         }
         
         _updateOtherSensorData();
+=======
+  @override
+  void initState() {
+    super.initState();
+    _initializeHistoryData();
+    _simulateSensorData();
+    Future.delayed(Duration(milliseconds: 500), () {
+      setState(() => _loading = false);
+    });
+  }
+
+  void _initializeHistoryData() {
+    // إنشاء بيانات تاريخية أولية (آخر 6 قراءات)
+    for (int i = 0; i < 6; i++) {
+      _heartRateHistory.add(70 + (i * 3));
+      _bloodPressureHistory.add(115 + (i * 4));
+      _oxygenHistory.add(95 + (i % 3));
+      _temperatureHistory.add(36.5 + (i * 0.2));
+    }
+  }
+
+  void _simulateSensorData() {
+    Future.delayed(Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          // تحديث القراءات
+          _heartRate = 70 + (DateTime.now().second % 20);
+          _bloodPressure = 110 + (DateTime.now().second % 30);
+          _oxygenLevel = 95 + (DateTime.now().second % 5);
+          _temperature = 36.5 + (DateTime.now().second % 10) / 10;
+
+          // تحديث التاريخ
+          _updateHistoryData();
+        });
+        _simulateSensorData();
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
       }
     });
   }
 
+<<<<<<< HEAD
   void _initializeSimulatedHeartRate() {
     final random = Random();
     final List<double> initialHistory = [];
@@ -275,6 +327,14 @@ class _HomeScreenState extends State<HomeScreen> {
     _addToHistory(_bloodPressureHistory, _bloodPressure, 10);
     _addToHistory(_oxygenHistory, _oxygenLevel, 10);
     _addToHistory(_temperatureHistory, _temperature, 10);
+=======
+  void _updateHistoryData() {
+    // تحديث بيانات التاريخ مع الحفاظ على 6 قراءات فقط
+    _addToHistory(_heartRateHistory, _heartRate, 6);
+    _addToHistory(_bloodPressureHistory, _bloodPressure, 6);
+    _addToHistory(_oxygenHistory, _oxygenLevel, 6);
+    _addToHistory(_temperatureHistory, _temperature, 6);
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
   }
 
   void _addToHistory(List<double> history, double newValue, int maxLength) {
@@ -284,6 +344,7 @@ class _HomeScreenState extends State<HomeScreen> {
     history.add(newValue);
   }
 
+<<<<<<< HEAD
   Future<void> _forceRefreshData() async {
     setState(() => _loading = true);
     
@@ -346,6 +407,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Text(
                     title,
                     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+=======
+  Widget _buildHealthCardWithGraph(String title, double value, String unit, IconData icon, Color color, List<double> history) {
+    return Card(
+      elevation: 3,
+      child: Padding(
+        padding: EdgeInsets.all(12),
+        child: Column(
+          children: [
+            // 🔹 العنوان والقيمة
+            Row(
+              children: [
+                Icon(icon, color: color, size: 20),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                   ),
                 ),
                 Text(
@@ -356,11 +435,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: color,
                   ),
                 ),
+<<<<<<< HEAD
                 const SizedBox(width: 4),
+=======
+                SizedBox(width: 4),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                 Text(
                   unit,
                   style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
                 ),
+<<<<<<< HEAD
                 if (isHeartRate && _deviceSerialNumber != null)
                   Container(
                     margin: const EdgeInsets.only(left: 4),
@@ -393,6 +477,22 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 8),
             Container(height: 40, child: _buildMiniGraph(history, color)),
             const SizedBox(height: 4),
+=======
+              ],
+            ),
+
+            SizedBox(height: 8),
+
+            // 🔹 جراف مصغر
+            Container(
+              height: 40,
+              child: _buildMiniGraph(history, color),
+            ),
+
+            SizedBox(height: 4),
+
+            // 🔹 مؤشر الاتجاه
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -411,6 +511,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       size: 12,
                       color: _getTrendColor(history),
                     ),
+<<<<<<< HEAD
                     const SizedBox(width: 2),
                     Text(
                       '${_calculateTrend(history).toStringAsFixed(1)}',
@@ -418,6 +519,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         fontSize: 10,
                         color: Colors.grey.shade600,
                       ),
+=======
+                    SizedBox(width: 2),
+                    Text(
+                      '${_calculateTrend(history).toStringAsFixed(1)}',
+                      style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                     ),
                   ],
                 ),
@@ -430,9 +537,16 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildMiniGraph(List<double> data, Color color) {
+<<<<<<< HEAD
     if (data.isEmpty) return const SizedBox();
     return CustomPaint(
       size: const Size(double.infinity, 40),
+=======
+    if (data.length < 2) return SizedBox();
+
+    return CustomPaint(
+      size: Size(double.infinity, 40),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
       painter: _MiniGraphPainter(data, color),
     );
   }
@@ -471,6 +585,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
+<<<<<<< HEAD
       return Scaffold(
         body: Center(
           child: Column(
@@ -583,18 +698,89 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                         ],
                       ),
+=======
+      return Center(child: CircularProgressIndicator());
+    }
+
+    return Scaffold(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 🔹 بطاقة الترحيب
+            Card(
+              color: Colors.blue.shade50,
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Colors.blue.shade100,
+                      child: Icon(Icons.person, size: 25, color: Colors.blue.shade700),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'مرحباً ${widget.userName ?? 'مستخدم'} 👋',
+                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'نظام مراقبة الصحة الذكي',
+                            style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                          ),
+                          if (widget.userDevice != null)
+                            Padding(
+                              padding: EdgeInsets.only(top: 4),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.device_hub, size: 12, color: Colors.grey.shade600),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'الجهاز: ${widget.userDevice!['serial_number']}',
+                                    style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.refresh, color: Colors.blue, size: 20),
+                      onPressed: () {
+                        setState(() {
+                          _heartRate = 70 + (DateTime.now().second % 20);
+                          _updateHistoryData();
+                        });
+                      },
+                    ),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                   ],
                 ),
               ),
             ),
 
+<<<<<<< HEAD
             const SizedBox(height: 16),
+=======
+            SizedBox(height: 16),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
 
             // 🔹 بطاقات القياس مع جرافات
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
+<<<<<<< HEAD
               physics: const NeverScrollableScrollPhysics(),
+=======
+              physics: NeverScrollableScrollPhysics(),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
               childAspectRatio: 1.3,
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
@@ -606,7 +792,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Icons.favorite,
                   _getHeartRateColor(_heartRate),
                   _heartRateHistory,
+<<<<<<< HEAD
                   true,
+=======
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                 ),
                 _buildHealthCardWithGraph(
                   'ضغط الدم',
@@ -615,7 +804,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Icons.speed,
                   _getBloodPressureColor(_bloodPressure),
                   _bloodPressureHistory,
+<<<<<<< HEAD
                   false,
+=======
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                 ),
                 _buildHealthCardWithGraph(
                   'مستوى الأكسجين',
@@ -624,7 +816,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Icons.water_drop,
                   _getOxygenColor(_oxygenLevel),
                   _oxygenHistory,
+<<<<<<< HEAD
                   false,
+=======
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                 ),
                 _buildHealthCardWithGraph(
                   'درجة الحرارة',
@@ -633,23 +828,35 @@ class _HomeScreenState extends State<HomeScreen> {
                   Icons.thermostat,
                   _getTemperatureColor(_temperature),
                   _temperatureHistory,
+<<<<<<< HEAD
                   false,
+=======
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                 ),
               ],
             ),
 
+<<<<<<< HEAD
             const SizedBox(height: 16),
+=======
+            SizedBox(height: 16),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
 
             // 🔹 جراف رئيسي لمعدل ضربات القلب
             Card(
               elevation: 3,
               child: Padding(
+<<<<<<< HEAD
                 padding: const EdgeInsets.all(12),
+=======
+                padding: EdgeInsets.all(12),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
+<<<<<<< HEAD
                         Icon(
                           Icons.favorite,
                           color: _usingRealData ? Colors.green : Colors.red,
@@ -690,6 +897,52 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildStatItem('الأدنى', _getMinValue(_heartRateHistory)),
                         _buildStatItem('الأعلى', _getMaxValue(_heartRateHistory)),
                         _buildStatItem('المتوسط', _getAverageValue(_heartRateHistory)),
+=======
+                        Icon(Icons.show_chart, color: Colors.blue, size: 18),
+                        SizedBox(width: 8),
+                        Text(
+                          'تطور معدل ضربات القلب',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                        ),
+                        Spacer(),
+                        Text(
+                          'آخر 6 قراءات',
+                          style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 12),
+                    Container(
+                      height: 120,
+                      child: _buildMainGraph(_heartRateHistory, Colors.red, 'نبضة/دقيقة'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            SizedBox(height: 16),
+
+            // 🔹 إحصائيات سريعة
+            Card(
+              child: Padding(
+                padding: EdgeInsets.all(12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '📊 ملخص اليوم',
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        _buildQuickStat('قراءات اليوم', '24', Icons.assessment),
+                        _buildQuickStat('في النطاق', '22', Icons.check_circle),
+                        _buildQuickStat('تحت المراقبة', '2', Icons.warning),
+                        _buildQuickStat('التوصيات', '3', Icons.medical_services),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                       ],
                     ),
                   ],
@@ -697,6 +950,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
+<<<<<<< HEAD
             const SizedBox(height: 16),
 
             // 🔹 معلومات التقنية
@@ -724,10 +978,32 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (!_usingRealData)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
+=======
+            SizedBox(height: 16),
+
+            // 🔹 حالة الاتصال
+            if (widget.userDevice != null)
+              Card(
+                child: Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade100,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(Icons.wifi, size: 16, color: Colors.green),
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
+<<<<<<< HEAD
                               '💡 ملاحظة: لإظهار بيانات حقيقية من Supabase:',
                               style: TextStyle(
                                 fontSize: 11,
@@ -744,20 +1020,47 @@ class _HomeScreenState extends State<HomeScreen> {
                                 fontSize: 10,
                                 color: Colors.grey.shade700,
                               ),
+=======
+                              'جهاز متصل',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            ),
+                            Text(
+                              'آخر تحديث: ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}',
+                              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
                             ),
                           ],
                         ),
                       ),
+<<<<<<< HEAD
                   ],
                 ),
               ),
             ),
+=======
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          'نشط',
+                          style: TextStyle(fontSize: 11, color: Colors.green.shade800),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
           ],
         ),
       ),
     );
   }
 
+<<<<<<< HEAD
   Widget _buildStatItem(String label, String value) {
     return Column(
       children: [
@@ -866,11 +1169,43 @@ class _HomeScreenState extends State<HomeScreen> {
                 .entries
                 .map((e) => FlSpot(e.key.toDouble(), e.value))
                 .toList(),
+=======
+  Widget _buildMainGraph(List<double> data, Color color, String unit) {
+    if (data.isEmpty) return Center(child: Text('لا توجد بيانات'));
+
+    return LineChart(
+      LineChartData(
+        gridData: FlGridData(show: false),
+        titlesData: FlTitlesData(
+          bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 30,
+              interval: 10,
+            ),
+          ),
+          topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        ),
+        borderData: FlBorderData(show: false),
+        minX: 0,
+        maxX: data.length > 1 ? (data.length - 1).toDouble() : 5,
+        minY: data.reduce((a, b) => a < b ? a : b) - 5,
+        maxY: data.reduce((a, b) => a > b ? a : b) + 5,
+        lineBarsData: [
+          LineChartBarData(
+            spots: data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList(),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
             isCurved: true,
             color: color,
             barWidth: 2.5,
             isStrokeCapRound: true,
+<<<<<<< HEAD
             dotData: const FlDotData(show: false),
+=======
+            dotData: FlDotData(show: true),
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(
@@ -882,10 +1217,35 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
+<<<<<<< HEAD
       duration: const Duration(milliseconds: 300),
     );
   }
 
+=======
+      duration: Duration(milliseconds: 300),
+    );
+  }
+
+  Widget _buildQuickStat(String title, String value, IconData icon) {
+    return Column(
+      children: [
+        Icon(icon, size: 20, color: Colors.blue),
+        SizedBox(height: 4),
+        Text(
+          value,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        Text(
+          title,
+          style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
+        ),
+      ],
+    );
+  }
+
+  // 🔹 دوال تحديد الألوان
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
   Color _getHeartRateColor(double rate) {
     if (rate > 90) return Colors.red;
     if (rate < 60) return Colors.orange;
@@ -909,6 +1269,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+<<<<<<< HEAD
+=======
+// 🔹 رسام الجراف المصغر
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
 class _MiniGraphPainter extends CustomPainter {
   final List<double> data;
   final Color color;
@@ -929,6 +1293,10 @@ class _MiniGraphPainter extends CustomPainter {
       ..color = color.withOpacity(0.1)
       ..style = PaintingStyle.fill;
 
+<<<<<<< HEAD
+=======
+    final path = Path();
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
     final points = <Offset>[];
 
     final minValue = data.reduce((a, b) => a < b ? a : b);
@@ -944,12 +1312,23 @@ class _MiniGraphPainter extends CustomPainter {
       points.add(Offset(x, y));
     }
 
+<<<<<<< HEAD
+=======
+    // رسم الخط
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
     for (int i = 0; i < points.length - 1; i++) {
       canvas.drawLine(points[i], points[i + 1], paint);
     }
 
+<<<<<<< HEAD
     if (points.length > 1) {
       final fillPath = Path()..moveTo(points.first.dx, points.first.dy);
+=======
+    // رسم التعبئة
+    if (points.length > 1) {
+      final fillPath = Path()
+        ..moveTo(points.first.dx, points.first.dy);
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
 
       for (int i = 1; i < points.length; i++) {
         fillPath.lineTo(points[i].dx, points[i].dy);
@@ -961,6 +1340,18 @@ class _MiniGraphPainter extends CustomPainter {
 
       canvas.drawPath(fillPath, fillPaint);
     }
+<<<<<<< HEAD
+=======
+
+    // رسم النقاط
+    final dotPaint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    for (final point in points) {
+      canvas.drawCircle(point, 1.5, dotPaint);
+    }
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
   }
 
   @override

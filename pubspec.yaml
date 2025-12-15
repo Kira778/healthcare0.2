@@ -10,6 +10,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+<<<<<<< HEAD
+=======
+
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
   supabase_flutter: ^2.5.6
   cupertino_icons: ^1.0.8
   fl_chart: ^0.66.0

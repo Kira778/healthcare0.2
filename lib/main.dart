@@ -1,9 +1,17 @@
+<<<<<<< HEAD
  import 'package:flutter/material.dart';
+=======
+import 'package:flutter/material.dart';
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'presentation/screens/login/login_screen.dart';
 import 'presentation/screens/main_layout.dart';
 import 'core/auth/auth_gate.dart';
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 510688871d3338ab9876665aa0d631033a50755e
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
