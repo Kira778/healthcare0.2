@@ -1,0 +1,123 @@
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'home/home_screen.dart';
+import 'notifications/notifications_screen.dart';
+import 'recommendations/recommendations_screen.dart';
+import 'profile/profile_screen.dart';
+
+class MainLayout extends StatefulWidget {
+  final Map<String, dynamic>? userDevice;
+  final String? userName; // ⭐ استقبال اسم المستخدم
+
+  const MainLayout({super.key, this.userDevice, this.userName});
+
+  @override
+  State<MainLayout> createState() => _MainLayoutState();
+}
+
+class _MainLayoutState extends State<MainLayout> {
+  int _selectedIndex = 0;
+  final SupabaseClient _supabase = Supabase.instance.client;
+
+  // ⭐ قائمة الشاشات - سيتم تمرير البيانات لكل شاشة
+  late final List<Widget> _screens;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // ⭐ تهيئة الشاشات مع تمرير البيانات المطلوبة
+    _screens = [
+      HomeScreen(
+        userName: widget.userName,
+        userDevice: widget.userDevice,
+      ),
+      NotificationsScreen(),
+      RecommendationsScreen(),
+      ProfileScreen(
+        userName: widget.userName,
+        userDevice: widget.userDevice,
+      ),
+    ];
+  }
+
+  final List<String> _appBarTitles = [
+    'الصفحة الرئيسية',
+    'الإشعارات',
+    'التوصيات',
+    'الملف الشخصي'
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() => _selectedIndex = index);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Icon(
+              _selectedIndex == 0 ? Icons.home :
+              _selectedIndex == 1 ? Icons.notifications :
+              _selectedIndex == 2 ? Icons.medical_services :
+              Icons.person,
+              color: Colors.white,
+            ),
+            SizedBox(width: 10),
+            Text(
+              _appBarTitles[_selectedIndex],
+              style: TextStyle(color: Colors.white),
+            ),
+          ],
+        ),
+        backgroundColor: Colors.blue[700],
+        elevation: 3,
+        actions: [
+          if (widget.userDevice != null)
+            Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Chip(
+                label: Text(
+                  'SN: ${widget.userDevice!['serial_number']}',
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                backgroundColor: Colors.green[700],
+              ),
+            ),
+        ],
+      ),
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.blue[700],
+        unselectedItemColor: Colors.grey[600],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'الرئيسية',
+          ),
+          BottomNavigationBarItem(
+            icon: Badge(
+              label: Text('3'),
+              child: Icon(Icons.notifications),
+            ),
+            label: 'الإشعارات',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.medical_services),
+            label: 'التوصيات',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'الملف الشخصي',
+          ),
+        ],
+      ),
+    );
+  }
+}
