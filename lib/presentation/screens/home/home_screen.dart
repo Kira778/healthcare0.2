@@ -35,7 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _initializeHistoryData() {
-    // إنشاء بيانات تاريخية أولية (آخر 6 قراءات)
     for (int i = 0; i < 6; i++) {
       _heartRateHistory.add(70 + (i * 3));
       _bloodPressureHistory.add(115 + (i * 4));
