@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final SupabaseClient supabase = Supabase.instance.client;
   bool _loading = true;
   bool _usingRealData = false;
-
+  bool _hasRealHeartRateData = false;
   double _heartRate = 72.0;
   List<double> _heartRateHistory = [];
 
@@ -44,6 +44,15 @@ class _HomeScreenState extends State<HomeScreen> {
     _startDataLoading();
   }
 
+  void _initializeEmptyHeartRate() {
+    setState(() {
+      _heartRateHistory = []; // ⭐ تاريخ فارغ
+      _heartRate = 0; // ⭐ قيمة صفر
+      _usingRealData = true; // ⭐ نظل متصلين بـ Supabase
+      _hasRealHeartRateData = false; // ⭐ لكن لا توجد بيانات
+    });
+  }
+
   @override
   void dispose() {
     _updateTimer.cancel();
@@ -61,7 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final String emailToFetch = widget.userEmail;
       print('🔍 البحث عن بيانات المستخدم: $emailToFetch');
 
-      // 1. البحث عن ملف المستخدم باستخدام البريد
       final profileResponse = await supabase
           .from('profiles')
           .select('serial_number, full_name')
@@ -69,24 +77,18 @@ class _HomeScreenState extends State<HomeScreen> {
           .maybeSingle();
 
       if (profileResponse != null && profileResponse['serial_number'] != null) {
-        // ⭐️ serial_number هو bigint (رقم كبير)
         _deviceSerialNumber = profileResponse['serial_number'] as int;
         print('✅ تم العثور على رقم الجهاز: $_deviceSerialNumber');
-        print('👤 اسم المستخدم: ${profileResponse['full_name']}');
 
-        // 2. محاولة جلب قراءات النبض من device_readings
-        await _fetchRealHeartRateData();
+        await _fetchRealHeartRateData(); // ⭐ استدعاء الدالة المعدلة
 
-        if (_heartRateHistory.isNotEmpty) {
-          setState(() {
-            _usingRealData = true;
-          });
+        if (_hasRealHeartRateData) {
+          // ⭐ تحقق من هذا المتغير بدلاً من _heartRateHistory.isNotEmpty
           print('✅ جلب ${_heartRateHistory.length} قراءة نبض من Supabase');
         } else {
-          print(
-            '⚠️ لا توجد قراءات نبض في قاعدة البيانات، سيتم استخدام المحاكاة',
-          );
-          _initializeSimulatedHeartRate();
+          print('⚠️ لا توجد قراءات نبض في قاعدة البيانات');
+          // ⭐ لا تستدعي _initializeSimulatedHeartRate هنا
+          // ⭐ دع _fetchRealHeartRateData تتعامل مع الحالة
         }
       } else {
         print('⚠️ لم يتم العثور على مستخدم بهذا البريد: $emailToFetch');
@@ -103,33 +105,23 @@ class _HomeScreenState extends State<HomeScreen> {
     if (_deviceSerialNumber == null) return;
 
     try {
-      print('🔍 جاري جلب بيانات النبض من جدول device_readings...');
-      print('🔢 رقم الجهاز المستخدم: $_deviceSerialNumber');
+      print('🔍 جاري البحث عن بيانات النبض من Supabase...');
 
-      // ⭐️ البحث عن قراءات النبض بناءً على device_serial (الذي هو bigint)
       final response = await supabase
           .from('device_readings')
-          .select('reading_value, reading_time, device_serial')
-          .eq('device_serial', _deviceSerialNumber!) // ⭐️ هنا نستخدم int
+          .select('reading_value, reading_time')
+          .eq('device_serial', _deviceSerialNumber!)
           .order('reading_time', ascending: false)
           .limit(15);
 
-      print('📊 استجابة Supabase: $response');
-
       if (response.isNotEmpty) {
-        print('📈 عدد القراءات المستلمة: ${response.length}');
+        print('✅ تم العثور على ${response.length} قراءة في Supabase');
 
         final List<double> newHistory = [];
         for (var reading in response.reversed.toList()) {
           final value = reading['reading_value'];
-          final deviceSerial = reading['device_serial'];
-          final readingTime = reading['reading_time'];
-
-          print('📖 قراءة: قيمة=$value, جهاز=$deviceSerial, وقت=$readingTime');
-
           if (value != null) {
-            final doubleValue = (value as num).toDouble();
-            newHistory.add(doubleValue);
+            newHistory.add((value as num).toDouble());
           }
         }
 
@@ -137,29 +129,25 @@ class _HomeScreenState extends State<HomeScreen> {
           setState(() {
             _heartRateHistory = newHistory;
             _heartRate = newHistory.last;
+            _usingRealData = true;
+            _hasRealHeartRateData = true;
           });
-          print('✅ تم تحميل ${newHistory.length} قراءة بنجاح');
-          print('📊 آخر قراءة: $_heartRate');
+          print('📊 تم تحميل ${newHistory.length} قراءة نبض حقيقية');
         } else {
-          print('⚠️ القراءات موجودة ولكنها فارغة');
+          print('⚠️ القراءات موجودة ولكن فارغة');
+          _initializeEmptyHeartRate(); // ⭐ استخدم الدالة الجديدة
         }
       } else {
-        print(
-          '⚠️ لا توجد قراءات في جدول device_readings للجهاز $_deviceSerialNumber',
-        );
-        print('💡 تأكد من:');
-        print('   1. وجود بيانات في جدول device_readings');
-        print('   2. تطابق device_serial مع serial_number في جدول profiles');
-        print('   3. قم بإضافة بيانات تجريبية:');
-        print(
-          '      INSERT INTO device_readings (device_serial, reading_value, reading_time)',
-        );
-        print('      VALUES ($_deviceSerialNumber, 75, NOW());');
+        print('⚠️ لا توجد قراءات نهائياً في Supabase');
+        _initializeEmptyHeartRate(); // ⭐ استخدم الدالة الجديدة
       }
     } catch (e) {
       print('❌ خطأ في جلب بيانات النبض: $e');
-      print('💡 التفاصيل: ${e.toString()}');
-      rethrow;
+      setState(() {
+        _usingRealData = false;
+        _hasRealHeartRateData = false;
+      });
+      _initializeSimulatedHeartRate(); // ⭐ فقط في حالة الخطأ
     }
   }
 
@@ -169,7 +157,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       final response = await supabase
           .from('device_readings')
-          .select('reading_value')
+          .select('reading_value, reading_time')
           .eq('device_serial', _deviceSerialNumber!)
           .order('reading_time', ascending: false)
           .limit(1)
@@ -177,20 +165,22 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (response != null && response['reading_value'] != null) {
         final newHeartRate = (response['reading_value'] as num).toDouble();
+        final readingTime = response['reading_time'] as String?;
 
-        // تحديث فقط إذا كانت القراءة مختلفة
-        if ((newHeartRate - _heartRate).abs() > 0.5) {
-          setState(() {
-            _heartRate = newHeartRate;
+        print('🔄 تم استلام قراءة جديدة: $newHeartRate في $readingTime');
 
-            if (_heartRateHistory.length >= 15) {
-              _heartRateHistory.removeAt(0);
-            }
-            _heartRateHistory.add(_heartRate);
-          });
+        setState(() {
+          _heartRate = newHeartRate;
+          _hasRealHeartRateData = true;
 
-          print('🔄 تم تحديث النبض من Supabase: $_heartRate');
-        }
+          if (_heartRateHistory.length >= 15) {
+            _heartRateHistory.removeAt(0);
+          }
+          _heartRateHistory.add(_heartRate);
+        });
+      } else {
+        print('⚠️ لا توجد قراءات جديدة من الجهاز');
+        // لا نغير _hasRealHeartRateData لأن قد تكون هناك قراءات قديمة
       }
     } catch (e) {
       print('❌ خطأ في جلب آخر قراءة: $e');
@@ -222,18 +212,21 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _heartRateHistory = initialHistory;
       _heartRate = initialHistory.last;
-      _usingRealData = false;
+      _usingRealData = false; // ⭐ محاكاة
+      _hasRealHeartRateData = false; // ⭐ ليست بيانات حقيقية
     });
   }
 
   void _updateSimulatedHeartRate() {
+    if (_hasRealHeartRateData) return; // ⭐ لا نحدث إذا كان لدينا بيانات حقيقية
+
     final random = Random();
     final newHeartRate = 70 + random.nextDouble() * 20;
 
     setState(() {
       _heartRate = newHeartRate;
 
-      if (_heartRateHistory.length >= 15) {
+      if (_heartRateHistory.length >= 20) {
         _heartRateHistory.removeAt(0);
       }
       _heartRateHistory.add(_heartRate);
@@ -344,105 +337,188 @@ class _HomeScreenState extends State<HomeScreen> {
     List<double> history,
     bool isHeartRate,
   ) {
+    final bool isEmpty =
+        isHeartRate && !_hasRealHeartRateData && _usingRealData;
+    final bool isSimulated = isHeartRate && !_usingRealData;
+
     return Card(
       elevation: 3,
+      color: isEmpty ? Colors.grey[100] : null,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             Row(
               children: [
-                Icon(icon, color: color, size: 20),
+                Icon(
+                  icon,
+                  color: isEmpty
+                      ? Colors.grey
+                      : (isSimulated ? Colors.orange : color),
+                  size: 20,
+                ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                Text(
-                  value.toStringAsFixed(title == 'درجة الحرارة' ? 1 : 0),
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: color,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  unit,
-                  style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-                ),
-                if (isHeartRate && _deviceSerialNumber != null)
-                  Container(
-                    margin: const EdgeInsets.only(left: 4),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      color: _usingRealData
-                          ? Colors.green.shade50
-                          : Colors.orange.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _usingRealData ? Icons.cloud_done : Icons.sim_card,
-                          size: 10,
-                          color: _usingRealData ? Colors.green : Colors.orange,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: isEmpty ? Colors.grey[600] : Colors.black,
                         ),
-                        const SizedBox(width: 2),
+                      ),
+                      if (isHeartRate)
                         Text(
-                          'جهاز $_deviceSerialNumber',
+                          isEmpty
+                              ? 'لا توجد بيانات'
+                              : (isSimulated ? '(محاكاة)' : '(بيانات حقيقية)'),
                           style: TextStyle(
-                            fontSize: 8,
-                            color: _usingRealData
-                                ? Colors.green.shade800
-                                : Colors.orange.shade800,
+                            fontSize: 10,
+                            color: isEmpty
+                                ? Colors.grey
+                                : (isSimulated ? Colors.orange : Colors.green),
                           ),
                         ),
-                      ],
-                    ),
+                    ],
+                  ),
+                ),
+                if (isEmpty)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        'فارغة',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      Text(
+                        'آخر إرسال: غير متاح',
+                        style: TextStyle(fontSize: 9, color: Colors.grey),
+                      ),
+                    ],
+                  )
+                else
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        value.toStringAsFixed(title == 'درجة الحرارة' ? 1 : 0),
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: isSimulated ? Colors.orange : color,
+                        ),
+                      ),
+                      Text(
+                        unit,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                      if (isHeartRate && _usingRealData)
+                        Text(
+                          'آخر إرسال: ${_getLastUpdateTime()}',
+                          style: TextStyle(fontSize: 9, color: Colors.green),
+                        ),
+                    ],
                   ),
               ],
             ),
+
             const SizedBox(height: 8),
-            Container(height: 40, child: _buildMiniGraph(history, color)),
+
+            // 🔹 جراف مصغر
+            Container(
+              height: 40,
+              child: isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.sync_disabled,
+                            size: 16,
+                            color: Colors.grey,
+                          ),
+                          Text(
+                            'بانتظار البيانات',
+                            style: TextStyle(fontSize: 10, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    )
+                  : _buildMiniGraph(
+                      history,
+                      isSimulated ? Colors.orange : color,
+                    ),
+            ),
+
             const SizedBox(height: 4),
+
+            // 🔹 مؤشر الحالة
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  _getTrendText(history),
-                  style: TextStyle(
-                    fontSize: 10,
-                    color: _getTrendColor(history),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Row(
-                  children: [
-                    Icon(
-                      _getTrendIcon(history),
-                      size: 12,
-                      color: _getTrendColor(history),
-                    ),
-                    const SizedBox(width: 2),
-                    Text(
-                      '${_calculateTrend(history).toStringAsFixed(1)}',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.grey.shade600,
+                if (isEmpty)
+                  Row(
+                    children: [
+                      Icon(Icons.wifi_off, size: 12, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        'غير متصل بالجهاز',
+                        style: TextStyle(fontSize: 10, color: Colors.grey),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  )
+                else if (isSimulated)
+                  Row(
+                    children: [
+                      Icon(Icons.sim_card, size: 12, color: Colors.orange),
+                      const SizedBox(width: 4),
+                      Text(
+                        'بيانات محاكاة',
+                        style: TextStyle(fontSize: 10, color: Colors.orange),
+                      ),
+                    ],
+                  )
+                else
+                  Row(
+                    children: [
+                      Icon(Icons.cloud_done, size: 12, color: Colors.green),
+                      const SizedBox(width: 4),
+                      Text(
+                        'بيانات حقيقية',
+                        style: TextStyle(fontSize: 10, color: Colors.green),
+                      ),
+                    ],
+                  ),
+
+                if (!isEmpty && history.length >= 2)
+                  Row(
+                    children: [
+                      Icon(
+                        _getTrendIcon(history),
+                        size: 12,
+                        color: _getTrendColor(history),
+                      ),
+                      const SizedBox(width: 2),
+                      Text(
+                        _getTrendText(history),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: _getTrendColor(history),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ],
@@ -457,6 +533,16 @@ class _HomeScreenState extends State<HomeScreen> {
       size: const Size(double.infinity, 40),
       painter: _MiniGraphPainter(data, color),
     );
+  }
+
+  String _getLastUpdateTime() {
+    if (_heartRateHistory.isEmpty) return 'غير متاح';
+
+    // يمكنك تخزين وقت آخر قراءة إذا كان عندك
+    final now = DateTime.now();
+    final hour = now.hour;
+    final minute = now.minute;
+    return '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
   }
 
   String _getTrendText(List<double> data) {
@@ -618,10 +704,168 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-
+            // 🔹 بطاقة الترحيب
+            Card(
+              color: Colors.blue.shade50,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundColor: Colors.blue.shade100,
+                      child: Icon(
+                        Icons.person,
+                        size: 25,
+                        color: Colors.blue.shade700,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'مرحباً ${widget.userName ?? 'مستخدم'} 👋', // ⭐ اسم الشخص هنا
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'نظام مراقبة الصحة الذكي',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: [
+                              Icon(
+                                _usingRealData
+                                    ? Icons.cloud_done
+                                    : Icons.cloud_off,
+                                size: 12,
+                                color: _usingRealData
+                                    ? Colors.green
+                                    : Colors.orange,
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _usingRealData
+                                    ? 'متصل بـ Supabase'
+                                    : 'بيانات محاكاة',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: _usingRealData
+                                      ? Colors.green
+                                      : Colors.orange,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.refresh, color: Colors.blue, size: 20),
+                      onPressed:
+                          _forceRefreshData, // ⭐ غير من _addTestDataToSupabase إلى _forceRefreshData
+                    ),
+                  ],
+                ),
+              ),
+            ),
             const SizedBox(height: 16),
-
+            // بعد بطاقة الترحيب مباشرة
+            Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  children: [
+                    Icon(
+                      _usingRealData ? Icons.cloud_done : Icons.cloud_off,
+                      color: _usingRealData ? Colors.green : Colors.orange,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            _usingRealData ? 'متصل بـ Supabase' : 'غير متصل',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: _usingRealData
+                                  ? Colors.green
+                                  : Colors.orange,
+                            ),
+                          ),
+                          if (_usingRealData && _heartRateHistory.isNotEmpty)
+                            Text(
+                              'آخر قراءة: ${_heartRate.toStringAsFixed(0)} نبضة/دقيقة',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.grey[600],
+                              ),
+                            )
+                          else if (_usingRealData)
+                            Text(
+                              'جاري انتظار البيانات...',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Colors.orange[600],
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    if (_deviceSerialNumber != null)
+                      Chip(
+                        label: Text(
+                          'جهاز $_deviceSerialNumber',
+                          style: TextStyle(fontSize: 10),
+                        ),
+                        backgroundColor: Colors.blue[50],
+                      ),
+                  ],
+                ),
+              ),
+            ),
             // 🔹 بطاقات القياس مع جرافات
+            // عرض رسالة إذا كانت البيانات فارغة
+            if (_usingRealData && !_hasRealHeartRateData)
+              Card(
+                color: Colors.orange.shade50,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Icon(Icons.info, color: Colors.orange),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'لا توجد بيانات في Supabase. الجهاز متصل ولكن لم يرسل بيانات بعد.',
+                          style: TextStyle(color: Colors.orange.shade800),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: _addTestDataToSupabase,
+                        child: Text('إضافة بيانات تجريبية'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange.shade100,
+                          foregroundColor: Colors.orange.shade800,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
@@ -632,10 +876,12 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 _buildHealthCardWithGraph(
                   'معدل ضربات القلب',
-                  _heartRate,
+                  _heartRateHistory.isEmpty
+                      ? 0
+                      : _heartRate, // ⭐ تمرير 0 إذا فارغة
                   'نبضة/دقيقة',
                   Icons.favorite,
-                  _getHeartRateColor(_heartRate),
+                  _getHeartRateCardColor(), // ⭐ استخدام اللون الجديد
                   _heartRateHistory,
                   true,
                 ),
@@ -705,9 +951,36 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      height: 150,
+                      height: 120,
                       child: _heartRateHistory.isEmpty
-                          ? const Center(child: Text('لا توجد بيانات نبض'))
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.heart_broken,
+                                    size: 40,
+                                    color: Colors.grey,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'لا توجد بيانات نبض',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  if (_usingRealData)
+                                    Text(
+                                      'جاري انتظار بيانات من الجهاز',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            )
                           : _buildMainGraph(
                               _heartRateHistory,
                               _usingRealData ? Colors.green : Colors.red,
@@ -930,6 +1203,24 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       duration: const Duration(milliseconds: 300),
     );
+  }
+
+  String _getHeartRateDisplayText() {
+    if (_heartRateHistory.isEmpty) {
+      return 'فارغة';
+    }
+    return _heartRate.toStringAsFixed(0);
+  }
+
+  Color _getHeartRateCardColor() {
+    if (_usingRealData && !_hasRealHeartRateData) {
+      return Colors
+          .grey; // ⭐ لون رمادي عندما متصل بـ Supabase ولكن لا توجد بيانات
+    }
+    if (!_usingRealData) {
+      return Colors.orange; // ⭐ لون برتقالي للمحاكاة
+    }
+    return _getHeartRateColor(_heartRate); // ⭐ اللون الطبيعي حسب القيمة
   }
 
   Color _getHeartRateColor(double rate) {
