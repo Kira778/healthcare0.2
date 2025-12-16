@@ -7,9 +7,14 @@ import 'dart:math';
 class HomeScreen extends StatefulWidget {
   final String? userName;
   final Map<String, dynamic>? userDevice;
+  final String userEmail;
 
-  const HomeScreen({super.key, this.userName, this.userDevice});
-
+  const HomeScreen({
+    super.key,
+    this.userName,
+    this.userDevice,
+    required this.userEmail, // ⭐️ تأكد من وجود required
+  });
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -53,10 +58,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _tryToFetchRealData() async {
     try {
-      final String emailToFetch = 'ahmedelmaghraby113@gmail.com';
-      
-      print('🔍 جاري البحث عن بيانات المستخدم...');
-      
+      final String emailToFetch = widget.userEmail;
+      print('🔍 البحث عن بيانات المستخدم: $emailToFetch');
+
       // 1. البحث عن ملف المستخدم باستخدام البريد
       final profileResponse = await supabase
           .from('profiles')
@@ -69,17 +73,19 @@ class _HomeScreenState extends State<HomeScreen> {
         _deviceSerialNumber = profileResponse['serial_number'] as int;
         print('✅ تم العثور على رقم الجهاز: $_deviceSerialNumber');
         print('👤 اسم المستخدم: ${profileResponse['full_name']}');
-        
+
         // 2. محاولة جلب قراءات النبض من device_readings
         await _fetchRealHeartRateData();
-        
+
         if (_heartRateHistory.isNotEmpty) {
           setState(() {
             _usingRealData = true;
           });
           print('✅ جلب ${_heartRateHistory.length} قراءة نبض من Supabase');
         } else {
-          print('⚠️ لا توجد قراءات نبض في قاعدة البيانات، سيتم استخدام المحاكاة');
+          print(
+            '⚠️ لا توجد قراءات نبض في قاعدة البيانات، سيتم استخدام المحاكاة',
+          );
           _initializeSimulatedHeartRate();
         }
       } else {
@@ -95,11 +101,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchRealHeartRateData() async {
     if (_deviceSerialNumber == null) return;
-    
+
     try {
       print('🔍 جاري جلب بيانات النبض من جدول device_readings...');
       print('🔢 رقم الجهاز المستخدم: $_deviceSerialNumber');
-      
+
       // ⭐️ البحث عن قراءات النبض بناءً على device_serial (الذي هو bigint)
       final response = await supabase
           .from('device_readings')
@@ -109,18 +115,18 @@ class _HomeScreenState extends State<HomeScreen> {
           .limit(15);
 
       print('📊 استجابة Supabase: $response');
-      
+
       if (response.isNotEmpty) {
         print('📈 عدد القراءات المستلمة: ${response.length}');
-        
+
         final List<double> newHistory = [];
         for (var reading in response.reversed.toList()) {
           final value = reading['reading_value'];
           final deviceSerial = reading['device_serial'];
           final readingTime = reading['reading_time'];
-          
+
           print('📖 قراءة: قيمة=$value, جهاز=$deviceSerial, وقت=$readingTime');
-          
+
           if (value != null) {
             final doubleValue = (value as num).toDouble();
             newHistory.add(doubleValue);
@@ -138,12 +144,16 @@ class _HomeScreenState extends State<HomeScreen> {
           print('⚠️ القراءات موجودة ولكنها فارغة');
         }
       } else {
-        print('⚠️ لا توجد قراءات في جدول device_readings للجهاز $_deviceSerialNumber');
+        print(
+          '⚠️ لا توجد قراءات في جدول device_readings للجهاز $_deviceSerialNumber',
+        );
         print('💡 تأكد من:');
         print('   1. وجود بيانات في جدول device_readings');
         print('   2. تطابق device_serial مع serial_number في جدول profiles');
         print('   3. قم بإضافة بيانات تجريبية:');
-        print('      INSERT INTO device_readings (device_serial, reading_value, reading_time)');
+        print(
+          '      INSERT INTO device_readings (device_serial, reading_value, reading_time)',
+        );
         print('      VALUES ($_deviceSerialNumber, 75, NOW());');
       }
     } catch (e) {
@@ -155,7 +165,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _fetchLatestHeartRate() async {
     if (_deviceSerialNumber == null || !_usingRealData) return;
-    
+
     try {
       final response = await supabase
           .from('device_readings')
@@ -167,18 +177,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
       if (response != null && response['reading_value'] != null) {
         final newHeartRate = (response['reading_value'] as num).toDouble();
-        
+
         // تحديث فقط إذا كانت القراءة مختلفة
         if ((newHeartRate - _heartRate).abs() > 0.5) {
           setState(() {
             _heartRate = newHeartRate;
-            
+
             if (_heartRateHistory.length >= 15) {
               _heartRateHistory.removeAt(0);
             }
             _heartRateHistory.add(_heartRate);
           });
-          
+
           print('🔄 تم تحديث النبض من Supabase: $_heartRate');
         }
       }
@@ -195,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
         } else {
           _updateSimulatedHeartRate();
         }
-        
+
         _updateOtherSensorData();
       }
     });
@@ -204,11 +214,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void _initializeSimulatedHeartRate() {
     final random = Random();
     final List<double> initialHistory = [];
-    
+
     for (int i = 0; i < 10; i++) {
       initialHistory.add(70 + random.nextDouble() * 20);
     }
-    
+
     setState(() {
       _heartRateHistory = initialHistory;
       _heartRate = initialHistory.last;
@@ -219,10 +229,10 @@ class _HomeScreenState extends State<HomeScreen> {
   void _updateSimulatedHeartRate() {
     final random = Random();
     final newHeartRate = 70 + random.nextDouble() * 20;
-    
+
     setState(() {
       _heartRate = newHeartRate;
-      
+
       if (_heartRateHistory.length >= 15) {
         _heartRateHistory.removeAt(0);
       }
@@ -232,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _updateOtherSensorData() {
     final random = Random();
-    
+
     setState(() {
       _bloodPressure = 110 + random.nextDouble() * 30;
       _oxygenLevel = 94 + random.nextDouble() * 6;
@@ -244,19 +254,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _initializeStaticHistoryData() {
     final random = Random();
-    
+
     _bloodPressureHistory.clear();
     _oxygenHistory.clear();
     _temperatureHistory.clear();
     _heartRateHistory.clear();
-    
+
     for (int i = 0; i < 10; i++) {
       _heartRateHistory.add(70 + random.nextDouble() * 20);
       _bloodPressureHistory.add(115 + random.nextDouble() * 20);
       _oxygenHistory.add(95 + random.nextDouble() * 3);
       _temperatureHistory.add(36.5 + random.nextDouble() * 1.0);
     }
-    
+
     if (_heartRateHistory.isNotEmpty) {
       _heartRate = _heartRateHistory.last;
     }
@@ -286,14 +296,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _forceRefreshData() async {
     setState(() => _loading = true);
-    
+
     try {
       await _tryToFetchRealData();
       print('🔄 تم تحديث البيانات بنجاح');
     } catch (e) {
       print('❌ خطأ في تحديث البيانات: $e');
     }
-    
+
     setState(() => _loading = false);
   }
 
@@ -303,19 +313,21 @@ class _HomeScreenState extends State<HomeScreen> {
       print('❌ لا يوجد رقم جهاز لإضافة بيانات تجريبية');
       return;
     }
-    
+
     try {
       // إضافة 5 قراءات تجريبية
       for (int i = 0; i < 5; i++) {
         final randomValue = 70 + Random().nextDouble() * 20;
-        
+
         await supabase.from('device_readings').insert({
           'device_serial': _deviceSerialNumber,
           'reading_value': randomValue,
-          'reading_time': DateTime.now().subtract(Duration(minutes: i * 5)).toIso8601String(),
+          'reading_time': DateTime.now()
+              .subtract(Duration(minutes: i * 5))
+              .toIso8601String(),
         });
       }
-      
+
       print('✅ تم إضافة بيانات تجريبية إلى Supabase');
       await _forceRefreshData();
     } catch (e) {
@@ -345,7 +357,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Text(
@@ -364,9 +379,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (isHeartRate && _deviceSerialNumber != null)
                   Container(
                     margin: const EdgeInsets.only(left: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
-                      color: _usingRealData ? Colors.green.shade50 : Colors.orange.shade50,
+                      color: _usingRealData
+                          ? Colors.green.shade50
+                          : Colors.orange.shade50,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -382,7 +402,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           'جهاز $_deviceSerialNumber',
                           style: TextStyle(
                             fontSize: 8,
-                            color: _usingRealData ? Colors.green.shade800 : Colors.orange.shade800,
+                            color: _usingRealData
+                                ? Colors.green.shade800
+                                : Colors.orange.shade800,
                           ),
                         ),
                       ],
@@ -481,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Text('جاري تحميل بيانات النبض...'),
               const SizedBox(height: 10),
               Text(
-                _deviceSerialNumber != null 
+                _deviceSerialNumber != null
                     ? 'رقم الجهاز: $_deviceSerialNumber'
                     : 'جاري البحث عن الجهاز...',
                 style: const TextStyle(fontSize: 12, color: Colors.grey),
@@ -494,7 +516,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('مراقبة الصحة'),
+        title: const Text('Helth Care'),
         actions: [
           if (!_usingRealData && _deviceSerialNumber != null)
             IconButton(
@@ -516,7 +538,9 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             // 🔹 معلومات النظام
             Card(
-              color: _usingRealData ? Colors.green.shade50 : Colors.orange.shade50,
+              color: _usingRealData
+                  ? Colors.green.shade50
+                  : Colors.orange.shade50,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -534,16 +558,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                _usingRealData ? '✅ متصل بـ Supabase' : '⚠️ وضع المحاكاة',
+                                _usingRealData
+                                    ? ' Conected Supabase'
+                                    : '⚠️  Virtual Mode',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
-                                  color: _usingRealData ? Colors.green.shade800 : Colors.orange.shade800,
+                                  color: _usingRealData
+                                      ? Colors.green.shade800
+                                      : Colors.orange.shade800,
                                 ),
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                _usingRealData 
+                                _usingRealData
                                     ? 'بيانات النبض تُجلب من قاعدة البيانات'
                                     : 'بيانات النبض محاكاة (لا توجد بيانات في device_readings)',
                                 style: const TextStyle(
@@ -577,7 +605,10 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blue.shade100,
                                 foregroundColor: Colors.blue.shade800,
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
                               ),
                               child: const Text('إضافة بيانات تجريبية'),
                             ),
@@ -687,9 +718,18 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        _buildStatItem('الأدنى', _getMinValue(_heartRateHistory)),
-                        _buildStatItem('الأعلى', _getMaxValue(_heartRateHistory)),
-                        _buildStatItem('المتوسط', _getAverageValue(_heartRateHistory)),
+                        _buildStatItem(
+                          'الأدنى',
+                          _getMinValue(_heartRateHistory),
+                        ),
+                        _buildStatItem(
+                          'الأعلى',
+                          _getMaxValue(_heartRateHistory),
+                        ),
+                        _buildStatItem(
+                          'المتوسط',
+                          _getAverageValue(_heartRateHistory),
+                        ),
                       ],
                     ),
                   ],
@@ -714,11 +754,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    _buildTechInfoItem('مصدر بيانات النبض', 
-                      _usingRealData ? 'Supabase (جدول device_readings)' : 'محاكاة'),
-                    _buildTechInfoItem('رقم الجهاز', 
-                      _deviceSerialNumber?.toString() ?? 'غير محدد'),
-                    _buildTechInfoItem('عدد القراءات', '${_heartRateHistory.length}'),
+                    _buildTechInfoItem(
+                      'مصدر بيانات النبض',
+                      _usingRealData
+                          ? 'Supabase (جدول device_readings)'
+                          : 'محاكاة',
+                    ),
+                    _buildTechInfoItem(
+                      'رقم الجهاز',
+                      _deviceSerialNumber?.toString() ?? 'غير محدد',
+                    ),
+                    _buildTechInfoItem(
+                      'عدد القراءات',
+                      '${_heartRateHistory.length}',
+                    ),
                     _buildTechInfoItem('آخر تحديث', _getFormattedTime()),
                     _buildTechInfoItem('معدل التحديث', 'كل 5 ثواني'),
                     if (!_usingRealData)
@@ -771,10 +820,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 10,
-            color: Colors.grey.shade600,
-          ),
+          style: TextStyle(fontSize: 10, color: Colors.grey.shade600),
         ),
       ],
     );
@@ -787,18 +833,12 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(
             '$title: ',
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
           ),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey.shade700,
-              ),
+              style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
             ),
           ),
         ],
@@ -837,7 +877,9 @@ class _HomeScreenState extends State<HomeScreen> {
       LineChartData(
         gridData: const FlGridData(show: false),
         titlesData: FlTitlesData(
-          bottomTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          bottomTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
           leftTitles: AxisTitles(
             sideTitles: SideTitles(
               showTitles: true,
@@ -851,8 +893,12 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
           ),
-          topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-          rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+          topTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
+          rightTitles: const AxisTitles(
+            sideTitles: SideTitles(showTitles: false),
+          ),
         ),
         borderData: FlBorderData(show: false),
         minX: 0,

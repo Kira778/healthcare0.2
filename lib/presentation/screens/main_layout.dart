@@ -8,9 +8,14 @@ import 'profile/profile_screen.dart';
 class MainLayout extends StatefulWidget {
   final Map<String, dynamic>? userDevice;
   final String? userName; // ⭐ استقبال اسم المستخدم
+  final String userEmail; // ⭐ أضف هذا السطر
 
-  const MainLayout({super.key, this.userDevice, this.userName});
-
+  const MainLayout({
+    super.key,
+    this.userDevice,
+    this.userName,
+    required this.userEmail, // ⭐ أضف required
+  });
   @override
   State<MainLayout> createState() => _MainLayoutState();
 }
@@ -31,12 +36,14 @@ class _MainLayoutState extends State<MainLayout> {
       HomeScreen(
         userName: widget.userName,
         userDevice: widget.userDevice,
+        userEmail: widget.userEmail, // ⭐ تمرير الإيميل إلى HomeScreen
       ),
       NotificationsScreen(),
       RecommendationsScreen(),
       ProfileScreen(
         userName: widget.userName,
         userDevice: widget.userDevice,
+        userEmail: widget.userEmail, // ⭐ إذا احتاج
       ),
     ];
   }
@@ -45,7 +52,7 @@ class _MainLayoutState extends State<MainLayout> {
     'الصفحة الرئيسية',
     'الإشعارات',
     'التوصيات',
-    'الملف الشخصي'
+    'الملف الشخصي',
   ];
 
   void _onItemTapped(int index) {
@@ -59,10 +66,13 @@ class _MainLayoutState extends State<MainLayout> {
         title: Row(
           children: [
             Icon(
-              _selectedIndex == 0 ? Icons.home :
-              _selectedIndex == 1 ? Icons.notifications :
-              _selectedIndex == 2 ? Icons.medical_services :
-              Icons.person,
+              _selectedIndex == 0
+                  ? Icons.home
+                  : _selectedIndex == 1
+                  ? Icons.notifications
+                  : _selectedIndex == 2
+                  ? Icons.medical_services
+                  : Icons.person,
               color: Colors.white,
             ),
             SizedBox(width: 10),
@@ -97,15 +107,9 @@ class _MainLayoutState extends State<MainLayout> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'الرئيسية'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'الرئيسية',
-          ),
-          BottomNavigationBarItem(
-            icon: Badge(
-              label: Text('3'),
-              child: Icon(Icons.notifications),
-            ),
+            icon: Badge(label: Text('3'), child: Icon(Icons.notifications)),
             label: 'الإشعارات',
           ),
           BottomNavigationBarItem(

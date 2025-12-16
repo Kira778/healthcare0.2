@@ -5,8 +5,13 @@ import '../login/login_screen.dart';
 class ProfileScreen extends StatefulWidget {
   final String? userName;
   final Map<String, dynamic>? userDevice;
-
-  const ProfileScreen({super.key, this.userName, this.userDevice});
+  final String userEmail;
+  const ProfileScreen({
+    super.key,
+    this.userName,
+    this.userDevice,
+    required this.userEmail,
+  });
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -23,32 +28,68 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserData();
   }
 
-  Future<void> _loadUserData() async {
-    try {
-      final user = _supabase.auth.currentUser;
-      if (user != null) {
-        final response = await _supabase
-            .from('profiles')
-            .select('*') // ⭐ اختيار جميع الأعمدة بما فيها age
-            .eq('id', user.id)
-            .maybeSingle()
-            .timeout(Duration(seconds: 10));
+Future<void> _loadUserData() async {
+  try {
+    print('🔍 جاري تحميل بيانات البروفايل...');
+    print('📧 الإيميل المستلم: ${widget.userEmail}');
+    
+    final userEmail = widget.userEmail;
 
-        print('📊 Profile data loaded: $response');
+    if (userEmail.isNotEmpty) {
+      // ⭐ البحث في profiles باستخدام الإيميل
+      final response = await _supabase
+          .from('profiles')
+          .select('*')
+          .eq('email', userEmail)
+          .maybeSingle()
+          .timeout(Duration(seconds: 10));
+
+      print('📊 Profile data loaded for email: $userEmail');
+      print('📋 Data type: ${response.runtimeType}');
+      print('📋 Data: $response');
+      
+      // ⭐ تحقق من نوع البيانات
+      if (response != null) {
+        print('✅ تم العثور على بيانات');
+        print('   serial_number نوع: ${response['serial_number'].runtimeType}');
+        print('   serial_number قيمة: ${response['serial_number']}');
+        
+        // ⭐ تحويل جميع القيم إلى String بشكل آمن
+        final processedData = Map<String, dynamic>.from(response);
+        
+        // تحويل serial_number إلى String إذا كان int
+        if (processedData['serial_number'] is int) {
+          processedData['serial_number'] = processedData['serial_number'].toString();
+        }
+        
+        // تحويل phone إلى String إذا كان int
+        if (processedData['phone'] is int) {
+          processedData['phone'] = processedData['phone'].toString();
+        }
+        
+        // تحويل age إلى String إذا كان int
+        if (processedData['age'] is int) {
+          processedData['age'] = processedData['age'].toString();
+        }
 
         setState(() {
-          _userData = response;
+          _userData = processedData;
           _loading = false;
         });
       } else {
-        print('❌ No user logged in');
+        print('❌ لم يتم العثور على بيانات للإيميل: $userEmail');
         setState(() => _loading = false);
       }
-    } catch (e) {
-      print('❌ Error loading profile: $e');
+    } else {
+      print('❌ الإيميل فارغ!');
       setState(() => _loading = false);
     }
+  } catch (e) {
+    print('❌ Error loading profile: $e');
+    print('❌ Stack trace: ${e.toString()}');
+    setState(() => _loading = false);
   }
+}
 
   Future<void> _signOut() async {
     try {
@@ -57,13 +98,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
-            (route) => false,
+        (route) => false,
       );
     } catch (e) {
       print('Error signing out: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('خطأ في تسجيل الخروج: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('خطأ في تسجيل الخروج: $e')));
     }
   }
 
@@ -76,7 +117,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Widget _buildInfoCard(String title, String value, IconData icon, {Color? iconColor}) {
+  Widget _buildInfoCard(
+    String title,
+    String value,
+    IconData icon, {
+    Color? iconColor,
+  }) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 5),
       elevation: 2,
@@ -135,11 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 CircleAvatar(
                   radius: 60,
                   backgroundColor: Colors.blue[100],
-                  child: Icon(
-                    Icons.person,
-                    size: 60,
-                    color: Colors.blue[700],
-                  ),
+                  child: Icon(Icons.person, size: 60, color: Colors.blue[700]),
                 ),
                 Positioned(
                   bottom: 0,
@@ -149,9 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(color: Colors.grey, blurRadius: 3),
-                      ],
+                      boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 3)],
                     ),
                     child: Icon(Icons.edit, size: 20, color: Colors.blue),
                   ),
@@ -163,12 +203,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
             // 🔹 معلومات المستخدم الأساسية
             Text(
-              widget.userName ?? _userData?['full_name'] ?? 'مستخدم',
+              _userData?['full_name'] ?? widget.userName ?? 'مستخدم',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 5),
             Text(
-              _userData?['email'] ?? 'لا يوجد بريد إلكتروني',
+              _userData?['email'] ??
+                  widget.userEmail ??
+                  'لا يوجد بريد إلكتروني',
               style: TextStyle(color: Colors.grey[600]),
             ),
 
@@ -213,7 +255,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Chip(
                             label: Text(
                               'نشط',
-                              style: TextStyle(color: Colors.white, fontSize: 12),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                              ),
                             ),
                             backgroundColor: Colors.green,
                           ),
@@ -223,11 +268,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       if (widget.userDevice!['assigned_at'] != null)
                         Row(
                           children: [
-                            Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                            Icon(
+                              Icons.calendar_today,
+                              size: 16,
+                              color: Colors.grey,
+                            ),
                             SizedBox(width: 8),
                             Text(
                               'تم التفعيل: ${_formatDate(widget.userDevice!['assigned_at'])}',
-                              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
                             ),
                           ],
                         ),
@@ -303,7 +355,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ListTile(
                     leading: Icon(Icons.language, color: Colors.blue),
                     title: Text('اللغة'),
-                    trailing: Text('العربية', style: TextStyle(color: Colors.grey)),
+                    trailing: Text(
+                      'العربية',
+                      style: TextStyle(color: Colors.grey),
+                    ),
                     onTap: () {},
                   ),
                   Divider(height: 0, indent: 20, endIndent: 20),
@@ -337,7 +392,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 leading: Icon(Icons.logout, color: Colors.red),
                 title: Text(
                   'تسجيل الخروج',
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 trailing: Icon(Icons.chevron_right, color: Colors.red),
                 onTap: () {
@@ -351,11 +409,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Text('تسجيل الخروج'),
                         ],
                       ),
-                      content: Text('هل أنت متأكد من رغبتك في تسجيل الخروج من التطبيق؟'),
+                      content: Text(
+                        'هل أنت متأكد من رغبتك في تسجيل الخروج من التطبيق؟',
+                      ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
-                          child: Text('إلغاء', style: TextStyle(color: Colors.blue)),
+                          child: Text(
+                            'إلغاء',
+                            style: TextStyle(color: Colors.blue),
+                          ),
                         ),
                         ElevatedButton(
                           onPressed: () {
@@ -364,7 +427,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 10,
+                            ),
                           ),
                           child: Text('تسجيل الخروج'),
                         ),
@@ -389,11 +455,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.medical_services, color: Colors.blue, size: 20),
+                      Icon(
+                        Icons.medical_services,
+                        color: Colors.blue,
+                        size: 20,
+                      ),
                       SizedBox(width: 8),
                       Text(
                         'Health Care System',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800]),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue[800],
+                        ),
                       ),
                     ],
                   ),
@@ -404,7 +477,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    '© 2024 جميع الحقوق محفوظة',
+                    '© 2026 جميع الحقوق محفوظة',
                     style: TextStyle(color: Colors.grey[500], fontSize: 11),
                   ),
                 ],

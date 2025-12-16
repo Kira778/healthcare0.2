@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../main_layout.dart';
 import 'register_screen.dart';
+import '../home/home_screen.dart'; // ⭐️ استيراد HomeScreen
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -39,10 +40,19 @@ class _LoginScreenState extends State<LoginScreen> {
         throw 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
       }
 
-      // الانتقال للشاشة الرئيسية
+      // ⭐️ استخراج بيانات المستخدم
+      final userName = response['full_name'] as String?;
+      final userEmail = response['email'] as String;
+
+      // ⭐️ الانتقال للشاشة الرئيسية مع إرسال الإيميل
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => MainLayout()),
+        MaterialPageRoute(
+          builder: (_) => MainLayout(
+            userEmail: userEmail, // ⭐️ إرسال الإيميل
+            userName: userName,
+          ),
+        ),
       );
 
     } catch (e) {
@@ -83,9 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
             loading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
-              onPressed: login,
-              child: const Text("Login"),
-            ),
+                    onPressed: login,
+                    child: const Text("Login"),
+                  ),
             TextButton(
               onPressed: () {
                 Navigator.push(
