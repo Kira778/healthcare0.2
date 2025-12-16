@@ -3,6 +3,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'presentation/screens/login/login_screen.dart';
 import 'presentation/screens/main_layout.dart';
 import 'core/auth/auth_gate.dart';
+import 'core/theme/theme_controller.dart';
+import 'presentation/screens/recommendations/recommendations_screen.dart';
+import 'presentation/screens/recommendations/chat_screen.dart'; // لو حابب تستخدمها مباشرة
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,13 +19,20 @@ void main() async {
 
   runApp(MyApp());
 }
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: AuthGate(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, mode, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: mode,
+          home: AuthGate(),
+        );
+      },
     );
   }
 }

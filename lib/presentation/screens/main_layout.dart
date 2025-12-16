@@ -39,7 +39,7 @@ class _MainLayoutState extends State<MainLayout> {
         userEmail: widget.userEmail, // ⭐ تمرير الإيميل إلى HomeScreen
       ),
       NotificationsScreen(),
-      RecommendationsScreen(),
+      RecommendationsScreen(bpm: 95),
       ProfileScreen(
         userName: widget.userName,
         userDevice: widget.userDevice,
