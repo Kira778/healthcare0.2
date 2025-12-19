@@ -1,10 +1,13 @@
+// lib/services/ai_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AIService {
-  final String _apiKey = "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"; // حط مفتاحك هنا
+  // Fake AI response for BPM analysis
+  final String _apiKey = "hf_Q"; // حط مفتاحك هنا
   final String _model = "moonshotai/Kimi-K2-Instruct-0905";
-
+//we make a request to Huggingface
+//and get a response from the LLM
   // Chat مع LLM
   Future<String> getChatResponse(String message) async {
     final url = Uri.parse("https://router.huggingface.co/v1/chat/completions");
@@ -38,21 +41,27 @@ class AIService {
 
   // تحليل BPM (نفس القديم)
   Future<Map<String, dynamic>> analyzeBPM(int bpm) async {
+    await Future.delayed(Duration(seconds: 1)); // محاكاة انتظار API
     await Future.delayed(const Duration(seconds: 1));
 
     if (bpm < 60) {
       return {
         'status': 'منخفض',
         'recommendations': [
+          'استرح قليلاً',
           'استرح قليلًا',
           'اشرب ماء',
+          'تجنب النشاط البدني الشديد'
         ],
       };
     } else if (bpm <= 100) {
-      return {
+
+@@ -18,25 +53,17 @@ class AIService {
         'status': 'طبيعي',
         'recommendations': [
           'حافظ على نشاطك الطبيعي',
+          'اشرب ماء بانتظام',
+          'نم جيدًا'
           'نم جيدًا',
         ],
       };
@@ -60,10 +69,19 @@ class AIService {
       return {
         'status': 'مرتفع',
         'recommendations': [
+          'استرخِ وخذ نفس عميق',
+          'تجنب التمارين الشاقة',
+          'راجع طبيبك إذا استمر الوضع'
           'استرخِ وخذ نفسًا عميقًا',
           'تجنب المجهود الشديد',
         ],
       };
     }
+  }
+
+  // Fake AI response for ChatScreen
+  Future<String> getChatResponse(String message) async {
+    await Future.delayed(Duration(seconds: 1));
+    return "AI: فهمت '$message', نصيحة: اهتم بصحتك!";
   }
 }
