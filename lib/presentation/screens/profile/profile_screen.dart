@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../login/login_screen.dart';
-import '../../../core/theme/theme_controller.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String? userName;
@@ -364,24 +363,11 @@ Future<void> _loadUserData() async {
                   ),
                   Divider(height: 0, indent: 20, endIndent: 20),
                   ListTile(
-  leading: Icon(
-    themeNotifier.value == ThemeMode.dark
-        ? Icons.dark_mode
-        : Icons.light_mode,
-    color: Colors.purple,
-  ),
-  title: Text('الوضع الداكن'),
-  trailing: Switch(
-    value: themeNotifier.value == ThemeMode.dark,
-    onChanged: (value) {
-      setState(() {
-        themeNotifier.value =
-            value ? ThemeMode.dark : ThemeMode.light;
-      });
-    },
-  ),
-),
-
+                    leading: Icon(Icons.visibility, color: Colors.purple),
+                    title: Text('مظهر التطبيق'),
+                    trailing: Icon(Icons.chevron_right, color: Colors.grey),
+                    onTap: () {},
+                  ),
                   Divider(height: 0, indent: 20, endIndent: 20),
                   ListTile(
                     leading: Icon(Icons.help, color: Colors.teal),
@@ -486,7 +472,7 @@ Future<void> _loadUserData() async {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    'إصدار 1.2',
+                    'إصدار 1.0.0',
                     style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
                   SizedBox(height: 5),
