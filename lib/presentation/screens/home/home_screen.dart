@@ -13,7 +13,7 @@ class HomeScreen extends StatefulWidget {
     super.key,
     this.userName,
     this.userDevice,
-    required this.userEmail, // ⭐️ تأكد من وجود required
+    required this.userEmail,
   });
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -34,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<double> _oxygenHistory = [];
   List<double> _temperatureHistory = [];
 
-  int? _deviceSerialNumber; // ⭐️ تغيير من String? إلى int?
+  int? _deviceSerialNumber;
   late Timer _updateTimer;
 
   @override
@@ -46,10 +46,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _initializeEmptyHeartRate() {
     setState(() {
-      _heartRateHistory = []; // ⭐ تاريخ فارغ
-      _heartRate = 0; // ⭐ قيمة صفر
-      _usingRealData = true; // ⭐ نظل متصلين بـ Supabase
-      _hasRealHeartRateData = false; // ⭐ لكن لا توجد بيانات
+      _heartRateHistory = [];
+      _heartRate = 0;
+      _usingRealData = true;
+      _hasRealHeartRateData = false;
     });
   }
 
@@ -80,15 +80,12 @@ class _HomeScreenState extends State<HomeScreen> {
         _deviceSerialNumber = profileResponse['serial_number'] as int;
         print('✅ تم العثور على رقم الجهاز: $_deviceSerialNumber');
 
-        await _fetchRealHeartRateData(); // ⭐ استدعاء الدالة المعدلة
+        await _fetchRealHeartRateData();
 
         if (_hasRealHeartRateData) {
-          // ⭐ تحقق من هذا المتغير بدلاً من _heartRateHistory.isNotEmpty
           print('✅ جلب ${_heartRateHistory.length} قراءة نبض من Supabase');
         } else {
           print('⚠️ لا توجد قراءات نبض في قاعدة البيانات');
-          // ⭐ لا تستدعي _initializeSimulatedHeartRate هنا
-          // ⭐ دع _fetchRealHeartRateData تتعامل مع الحالة
         }
       } else {
         print('⚠️ لم يتم العثور على مستخدم بهذا البريد: $emailToFetch');
@@ -135,11 +132,11 @@ class _HomeScreenState extends State<HomeScreen> {
           print('📊 تم تحميل ${newHistory.length} قراءة نبض حقيقية');
         } else {
           print('⚠️ القراءات موجودة ولكن فارغة');
-          _initializeEmptyHeartRate(); // ⭐ استخدم الدالة الجديدة
+          _initializeEmptyHeartRate();
         }
       } else {
         print('⚠️ لا توجد قراءات نهائياً في Supabase');
-        _initializeEmptyHeartRate(); // ⭐ استخدم الدالة الجديدة
+        _initializeEmptyHeartRate();
       }
     } catch (e) {
       print('❌ خطأ في جلب بيانات النبض: $e');
@@ -147,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _usingRealData = false;
         _hasRealHeartRateData = false;
       });
-      _initializeSimulatedHeartRate(); // ⭐ فقط في حالة الخطأ
+      _initializeSimulatedHeartRate();
     }
   }
 
@@ -180,7 +177,6 @@ class _HomeScreenState extends State<HomeScreen> {
         });
       } else {
         print('⚠️ لا توجد قراءات جديدة من الجهاز');
-        // لا نغير _hasRealHeartRateData لأن قد تكون هناك قراءات قديمة
       }
     } catch (e) {
       print('❌ خطأ في جلب آخر قراءة: $e');
@@ -212,13 +208,13 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _heartRateHistory = initialHistory;
       _heartRate = initialHistory.last;
-      _usingRealData = false; // ⭐ محاكاة
-      _hasRealHeartRateData = false; // ⭐ ليست بيانات حقيقية
+      _usingRealData = false;
+      _hasRealHeartRateData = false; 
     });
   }
 
   void _updateSimulatedHeartRate() {
-    if (_hasRealHeartRateData) return; // ⭐ لا نحدث إذا كان لدينا بيانات حقيقية
+    if (_hasRealHeartRateData) return;
 
     final random = Random();
     final newHeartRate = 70 + random.nextDouble() * 20;
@@ -300,7 +296,6 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => _loading = false);
   }
 
-  // دالة لإضافة بيانات تجريبية إلى Supabase
   Future<void> _addTestDataToSupabase() async {
     if (_deviceSerialNumber == null) {
       print('❌ لا يوجد رقم جهاز لإضافة بيانات تجريبية');
@@ -308,7 +303,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     try {
-      // إضافة 5 قراءات تجريبية
       for (int i = 0; i < 5; i++) {
         final randomValue = 70 + Random().nextDouble() * 20;
 
@@ -434,7 +428,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 8),
 
-            // 🔹 جراف مصغر
             Container(
               height: 40,
               child: isEmpty
@@ -462,7 +455,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 4),
 
-            // 🔹 مؤشر الحالة
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -538,7 +530,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String _getLastUpdateTime() {
     if (_heartRateHistory.isEmpty) return 'غير متاح';
 
-    // يمكنك تخزين وقت آخر قراءة إذا كان عندك
     final now = DateTime.now();
     final hour = now.hour;
     final minute = now.minute;
@@ -622,7 +613,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔹 معلومات النظام
             Card(
               color: _usingRealData
                   ? Colors.green.shade50
@@ -704,7 +694,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            // 🔹 بطاقة الترحيب
             Card(
               color: Colors.blue.shade50,
               child: Padding(
@@ -726,7 +715,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'مرحباً ${widget.userName ?? 'مستخدم'} 👋', // ⭐ اسم الشخص هنا
+                            'مرحباً ${widget.userName ?? 'مستخدم'} 👋',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -772,14 +761,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     IconButton(
                       icon: Icon(Icons.refresh, color: Colors.blue, size: 20),
                       onPressed:
-                          _forceRefreshData, // ⭐ غير من _addTestDataToSupabase إلى _forceRefreshData
+                          _forceRefreshData,
                     ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 16),
-            // بعد بطاقة الترحيب مباشرة
             Card(
               elevation: 2,
               child: Padding(
@@ -837,8 +825,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
-            // 🔹 بطاقات القياس مع جرافات
-            // عرض رسالة إذا كانت البيانات فارغة
+
             if (_usingRealData && !_hasRealHeartRateData)
               Card(
                 color: Colors.orange.shade50,
@@ -878,10 +865,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   'معدل ضربات القلب',
                   _heartRateHistory.isEmpty
                       ? 0
-                      : _heartRate, // ⭐ تمرير 0 إذا فارغة
+                      : _heartRate, 
                   'نبضة/دقيقة',
                   Icons.favorite,
-                  _getHeartRateCardColor(), // ⭐ استخدام اللون الجديد
+                  _getHeartRateCardColor(),
                   _heartRateHistory,
                   true,
                 ),
@@ -917,7 +904,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
 
-            // 🔹 جراف رئيسي لمعدل ضربات القلب
             Card(
               elevation: 3,
               child: Padding(
@@ -1012,7 +998,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
             const SizedBox(height: 16),
 
-            // 🔹 معلومات التقنية
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(12),
@@ -1215,12 +1200,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Color _getHeartRateCardColor() {
     if (_usingRealData && !_hasRealHeartRateData) {
       return Colors
-          .grey; // ⭐ لون رمادي عندما متصل بـ Supabase ولكن لا توجد بيانات
+          .grey;
     }
     if (!_usingRealData) {
-      return Colors.orange; // ⭐ لون برتقالي للمحاكاة
+      return Colors.orange;
     }
-    return _getHeartRateColor(_heartRate); // ⭐ اللون الطبيعي حسب القيمة
+    return _getHeartRateColor(_heartRate);
   }
 
   Color _getHeartRateColor(double rate) {
