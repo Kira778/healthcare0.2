@@ -505,7 +505,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 )
                     : Text(
                   'إنشاء الحساب وتفعيل الجهاز',
+<<<<<<< HEAD
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,color: Colors.white),
+=======
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+>>>>>>> f987f9d (New Editing)
                 ),
               ),
             ),

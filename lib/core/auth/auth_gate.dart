@@ -15,7 +15,10 @@ class _AuthGateState extends State<AuthGate> {
   bool _hasValidDevice = false;
   Map<String, dynamic>? _userDevice;
   String? _userName; // ⭐ إضافة متغير لاسم المستخدم
+<<<<<<< HEAD
   String? _userEmail;
+=======
+>>>>>>> f987f9d (New Editing)
 
   @override
   void initState() {
@@ -50,8 +53,11 @@ class _AuthGateState extends State<AuthGate> {
       if (profile != null) {
         setState(() {
           _userName = profile['full_name'] ?? profile['email']?.split('@')[0] ?? 'مستخدم';
+<<<<<<< HEAD
           _userEmail = profile['email'] as String?; // ⭐ حفظ الإيميل
 
+=======
+>>>>>>> f987f9d (New Editing)
         });
       }
     } catch (e) {
@@ -148,7 +154,10 @@ class _AuthGateState extends State<AuthGate> {
             return MainLayout(
               userDevice: _userDevice,
               userName: _userName,
+<<<<<<< HEAD
               userEmail: _userEmail ?? '',
+=======
+>>>>>>> f987f9d (New Editing)
             );
           } else {
             return _buildNoDeviceScreen(session.user.email ?? '');
