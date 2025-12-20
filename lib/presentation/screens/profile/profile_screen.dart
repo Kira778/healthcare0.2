@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../login/login_screen.dart';
-<<<<<<< HEAD
 import '../../../core/theme/theme_controller.dart';
-=======
->>>>>>> f987f9d (New Editing)
 
 class ProfileScreen extends StatefulWidget {
   final String? userName;
   final Map<String, dynamic>? userDevice;
-<<<<<<< HEAD
   final String userEmail;
   const ProfileScreen({
     super.key,
@@ -17,10 +13,6 @@ class ProfileScreen extends StatefulWidget {
     this.userDevice,
     required this.userEmail,
   });
-=======
-
-  const ProfileScreen({super.key, this.userName, this.userDevice});
->>>>>>> f987f9d (New Editing)
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -37,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _loadUserData();
   }
 
-<<<<<<< HEAD
 Future<void> _loadUserData() async {
   try {
     print('🔍 جاري تحميل بيانات البروفايل...');
@@ -100,34 +91,6 @@ Future<void> _loadUserData() async {
     setState(() => _loading = false);
   }
 }
-=======
-  Future<void> _loadUserData() async {
-    try {
-      final user = _supabase.auth.currentUser;
-      if (user != null) {
-        final response = await _supabase
-            .from('profiles')
-            .select('*') // ⭐ اختيار جميع الأعمدة بما فيها age
-            .eq('id', user.id)
-            .maybeSingle()
-            .timeout(Duration(seconds: 10));
-
-        print('📊 Profile data loaded: $response');
-
-        setState(() {
-          _userData = response;
-          _loading = false;
-        });
-      } else {
-        print('❌ No user logged in');
-        setState(() => _loading = false);
-      }
-    } catch (e) {
-      print('❌ Error loading profile: $e');
-      setState(() => _loading = false);
-    }
-  }
->>>>>>> f987f9d (New Editing)
 
   Future<void> _signOut() async {
     try {
@@ -136,7 +99,6 @@ Future<void> _loadUserData() async {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
-<<<<<<< HEAD
         (route) => false,
       );
     } catch (e) {
@@ -144,15 +106,6 @@ Future<void> _loadUserData() async {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('خطأ في تسجيل الخروج: $e')));
-=======
-            (route) => false,
-      );
-    } catch (e) {
-      print('Error signing out: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('خطأ في تسجيل الخروج: $e')),
-      );
->>>>>>> f987f9d (New Editing)
     }
   }
 
@@ -165,16 +118,12 @@ Future<void> _loadUserData() async {
     }
   }
 
-<<<<<<< HEAD
   Widget _buildInfoCard(
     String title,
     String value,
     IconData icon, {
     Color? iconColor,
   }) {
-=======
-  Widget _buildInfoCard(String title, String value, IconData icon, {Color? iconColor}) {
->>>>>>> f987f9d (New Editing)
     return Card(
       margin: EdgeInsets.symmetric(vertical: 5),
       elevation: 2,
@@ -233,15 +182,7 @@ Future<void> _loadUserData() async {
                 CircleAvatar(
                   radius: 60,
                   backgroundColor: Colors.blue[100],
-<<<<<<< HEAD
                   child: Icon(Icons.person, size: 60, color: Colors.blue[700]),
-=======
-                  child: Icon(
-                    Icons.person,
-                    size: 60,
-                    color: Colors.blue[700],
-                  ),
->>>>>>> f987f9d (New Editing)
                 ),
                 Positioned(
                   bottom: 0,
@@ -251,13 +192,7 @@ Future<void> _loadUserData() async {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-<<<<<<< HEAD
                       boxShadow: [BoxShadow(color: Colors.grey, blurRadius: 3)],
-=======
-                      boxShadow: [
-                        BoxShadow(color: Colors.grey, blurRadius: 3),
-                      ],
->>>>>>> f987f9d (New Editing)
                     ),
                     child: Icon(Icons.edit, size: 20, color: Colors.blue),
                   ),
@@ -269,22 +204,14 @@ Future<void> _loadUserData() async {
 
             // 🔹 معلومات المستخدم الأساسية
             Text(
-<<<<<<< HEAD
               _userData?['full_name'] ?? widget.userName ?? 'مستخدم',
-=======
-              widget.userName ?? _userData?['full_name'] ?? 'مستخدم',
->>>>>>> f987f9d (New Editing)
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 5),
             Text(
-<<<<<<< HEAD
               _userData?['email'] ??
                   widget.userEmail ??
                   'لا يوجد بريد إلكتروني',
-=======
-              _userData?['email'] ?? 'لا يوجد بريد إلكتروني',
->>>>>>> f987f9d (New Editing)
               style: TextStyle(color: Colors.grey[600]),
             ),
 
@@ -329,14 +256,10 @@ Future<void> _loadUserData() async {
                           Chip(
                             label: Text(
                               'نشط',
-<<<<<<< HEAD
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 12,
                               ),
-=======
-                              style: TextStyle(color: Colors.white, fontSize: 12),
->>>>>>> f987f9d (New Editing)
                             ),
                             backgroundColor: Colors.green,
                           ),
@@ -346,7 +269,6 @@ Future<void> _loadUserData() async {
                       if (widget.userDevice!['assigned_at'] != null)
                         Row(
                           children: [
-<<<<<<< HEAD
                             Icon(
                               Icons.calendar_today,
                               size: 16,
@@ -359,13 +281,6 @@ Future<void> _loadUserData() async {
                                 fontSize: 12,
                                 color: Colors.grey[600],
                               ),
-=======
-                            Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                            SizedBox(width: 8),
-                            Text(
-                              'تم التفعيل: ${_formatDate(widget.userDevice!['assigned_at'])}',
-                              style: TextStyle(fontSize: 12, color: Colors.grey[600]),
->>>>>>> f987f9d (New Editing)
                             ),
                           ],
                         ),
@@ -441,19 +356,14 @@ Future<void> _loadUserData() async {
                   ListTile(
                     leading: Icon(Icons.language, color: Colors.blue),
                     title: Text('اللغة'),
-<<<<<<< HEAD
                     trailing: Text(
                       'العربية',
                       style: TextStyle(color: Colors.grey),
                     ),
-=======
-                    trailing: Text('العربية', style: TextStyle(color: Colors.grey)),
->>>>>>> f987f9d (New Editing)
                     onTap: () {},
                   ),
                   Divider(height: 0, indent: 20, endIndent: 20),
                   ListTile(
-<<<<<<< HEAD
   leading: Icon(
     themeNotifier.value == ThemeMode.dark
         ? Icons.dark_mode
@@ -472,13 +382,6 @@ Future<void> _loadUserData() async {
   ),
 ),
 
-=======
-                    leading: Icon(Icons.visibility, color: Colors.purple),
-                    title: Text('مظهر التطبيق'),
-                    trailing: Icon(Icons.chevron_right, color: Colors.grey),
-                    onTap: () {},
-                  ),
->>>>>>> f987f9d (New Editing)
                   Divider(height: 0, indent: 20, endIndent: 20),
                   ListTile(
                     leading: Icon(Icons.help, color: Colors.teal),
@@ -503,14 +406,10 @@ Future<void> _loadUserData() async {
                 leading: Icon(Icons.logout, color: Colors.red),
                 title: Text(
                   'تسجيل الخروج',
-<<<<<<< HEAD
                   style: TextStyle(
                     color: Colors.red,
                     fontWeight: FontWeight.bold,
                   ),
-=======
-                  style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
->>>>>>> f987f9d (New Editing)
                 ),
                 trailing: Icon(Icons.chevron_right, color: Colors.red),
                 onTap: () {
@@ -524,7 +423,6 @@ Future<void> _loadUserData() async {
                           Text('تسجيل الخروج'),
                         ],
                       ),
-<<<<<<< HEAD
                       content: Text(
                         'هل أنت متأكد من رغبتك في تسجيل الخروج من التطبيق؟',
                       ),
@@ -535,13 +433,6 @@ Future<void> _loadUserData() async {
                             'إلغاء',
                             style: TextStyle(color: Colors.blue),
                           ),
-=======
-                      content: Text('هل أنت متأكد من رغبتك في تسجيل الخروج من التطبيق؟'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text('إلغاء', style: TextStyle(color: Colors.blue)),
->>>>>>> f987f9d (New Editing)
                         ),
                         ElevatedButton(
                           onPressed: () {
@@ -550,14 +441,10 @@ Future<void> _loadUserData() async {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
-<<<<<<< HEAD
                             padding: EdgeInsets.symmetric(
                               horizontal: 20,
                               vertical: 10,
                             ),
-=======
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
->>>>>>> f987f9d (New Editing)
                           ),
                           child: Text('تسجيل الخروج'),
                         ),
@@ -582,7 +469,6 @@ Future<void> _loadUserData() async {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-<<<<<<< HEAD
                       Icon(
                         Icons.medical_services,
                         color: Colors.blue,
@@ -595,32 +481,17 @@ Future<void> _loadUserData() async {
                           fontWeight: FontWeight.bold,
                           color: Colors.blue[800],
                         ),
-=======
-                      Icon(Icons.medical_services, color: Colors.blue, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Health Care System',
-                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800]),
->>>>>>> f987f9d (New Editing)
                       ),
                     ],
                   ),
                   SizedBox(height: 5),
                   Text(
-<<<<<<< HEAD
                     'إصدار 1.2',
-=======
-                    'إصدار 1.0.0',
->>>>>>> f987f9d (New Editing)
                     style: TextStyle(color: Colors.grey[600], fontSize: 12),
                   ),
                   SizedBox(height: 5),
                   Text(
-<<<<<<< HEAD
                     '© 2026 جميع الحقوق محفوظة',
-=======
-                    '© 2024 جميع الحقوق محفوظة',
->>>>>>> f987f9d (New Editing)
                     style: TextStyle(color: Colors.grey[500], fontSize: 11),
                   ),
                 ],
@@ -633,8 +504,4 @@ Future<void> _loadUserData() async {
       ),
     );
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> f987f9d (New Editing)

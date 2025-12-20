@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../main_layout.dart';
 import 'register_screen.dart';
-<<<<<<< HEAD
 import '../home/home_screen.dart'; // ⭐️ استيراد HomeScreen
-=======
->>>>>>> f987f9d (New Editing)
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -43,7 +40,6 @@ class _LoginScreenState extends State<LoginScreen> {
         throw 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
       }
 
-<<<<<<< HEAD
       // ⭐️ استخراج بيانات المستخدم
       final userName = response['full_name'] as String?;
       final userEmail = response['email'] as String;
@@ -57,12 +53,6 @@ class _LoginScreenState extends State<LoginScreen> {
             userName: userName,
           ),
         ),
-=======
-      // الانتقال للشاشة الرئيسية
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (_) => MainLayout()),
->>>>>>> f987f9d (New Editing)
       );
 
     } catch (e) {
@@ -103,15 +93,9 @@ class _LoginScreenState extends State<LoginScreen> {
             loading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
-<<<<<<< HEAD
                     onPressed: login,
                     child: const Text("Login"),
                   ),
-=======
-              onPressed: login,
-              child: const Text("Login"),
-            ),
->>>>>>> f987f9d (New Editing)
             TextButton(
               onPressed: () {
                 Navigator.push(
