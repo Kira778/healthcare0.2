@@ -2,10 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AIService {
-  ///***** */ final String _apiKey = ; // ضع مفتاحك هنا
-  ///***** */ final String _model = ;
 
-  // Chat مع LLM
   Future<String> getChatResponse(String message) async {
     final url = Uri.parse("https://router.huggingface.co/v1/chat/completions");
     final response = await http.post(
@@ -34,7 +31,6 @@ class AIService {
     }
   }
 
-  // تحليل BPM
   Future<Map<String, dynamic>> analyzeBPM(int bpm) async {
     await Future.delayed(const Duration(seconds: 1));
 

@@ -3,7 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class DeviceService {
   final SupabaseClient supabase = Supabase.instance.client;
 
-  /// التحقق من صحة السيريال
   Future<Map<String, dynamic>?> validateSerialNumber(String serialNumber) async {
     try {
       final serial = int.tryParse(serialNumber);
@@ -22,7 +21,6 @@ class DeviceService {
     }
   }
 
-  /// الحصول على أجهزة المستخدم
   Future<List<Map<String, dynamic>>> getUserDevices(String userId) async {
     try {
       final response = await supabase
@@ -38,7 +36,6 @@ class DeviceService {
     }
   }
 
-  /// فك ارتباط جهاز من المستخدم
   Future<bool> unassignDevice(String deviceId) async {
     try {
       await supabase
@@ -57,7 +54,6 @@ class DeviceService {
     }
   }
 
-  /// التحقق إذا كان السيريال مستخدم بالفعل
   Future<bool> isSerialAlreadyUsed(String serialNumber) async {
     try {
       final serial = int.tryParse(serialNumber);

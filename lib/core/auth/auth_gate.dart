@@ -14,7 +14,7 @@ class _AuthGateState extends State<AuthGate> {
   bool _isCheckingAuth = true;
   bool _hasValidDevice = false;
   Map<String, dynamic>? _userDevice;
-  String? _userName; // ⭐ إضافة متغير لاسم المستخدم
+  String? _userName;
   String? _userEmail;
 
   @override
@@ -28,7 +28,7 @@ class _AuthGateState extends State<AuthGate> {
       final session = Supabase.instance.client.auth.currentSession;
 
       if (session != null) {
-        await _loadUserProfile(session.user.id); // ⭐ جلب بيانات المستخدم أولاً
+        await _loadUserProfile(session.user.id); 
         await _checkUserDevice(session.user.id);
       }
     } catch (e) {
@@ -38,7 +38,6 @@ class _AuthGateState extends State<AuthGate> {
     }
   }
 
-  // ⭐ دالة جديدة لجلب بيانات المستخدم من profiles
   Future<void> _loadUserProfile(String userId) async {
     try {
       final profile = await Supabase.instance.client
@@ -50,7 +49,7 @@ class _AuthGateState extends State<AuthGate> {
       if (profile != null) {
         setState(() {
           _userName = profile['full_name'] ?? profile['email']?.split('@')[0] ?? 'مستخدم';
-          _userEmail = profile['email'] as String?; // ⭐ حفظ الإيميل
+          _userEmail = profile['email'] as String?;
 
         });
       }
@@ -144,7 +143,6 @@ class _AuthGateState extends State<AuthGate> {
 
         if (session != null) {
           if (_hasValidDevice) {
-            // ⭐ إرسال اسم المستخدم مع البيانات الأخرى
             return MainLayout(
               userDevice: _userDevice,
               userName: _userName,

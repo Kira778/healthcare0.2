@@ -37,7 +37,6 @@ Future<void> _loadUserData() async {
     final userEmail = widget.userEmail;
 
     if (userEmail.isNotEmpty) {
-      // ⭐ البحث في profiles باستخدام الإيميل
       final response = await _supabase
           .from('profiles')
           .select('*')
@@ -49,26 +48,21 @@ Future<void> _loadUserData() async {
       print('📋 Data type: ${response.runtimeType}');
       print('📋 Data: $response');
       
-      // ⭐ تحقق من نوع البيانات
       if (response != null) {
         print('✅ تم العثور على بيانات');
         print('   serial_number نوع: ${response['serial_number'].runtimeType}');
         print('   serial_number قيمة: ${response['serial_number']}');
         
-        // ⭐ تحويل جميع القيم إلى String بشكل آمن
         final processedData = Map<String, dynamic>.from(response);
         
-        // تحويل serial_number إلى String إذا كان int
         if (processedData['serial_number'] is int) {
           processedData['serial_number'] = processedData['serial_number'].toString();
         }
         
-        // تحويل phone إلى String إذا كان int
         if (processedData['phone'] is int) {
           processedData['phone'] = processedData['phone'].toString();
         }
         
-        // تحويل age إلى String إذا كان int
         if (processedData['age'] is int) {
           processedData['age'] = processedData['age'].toString();
         }
@@ -176,7 +170,6 @@ Future<void> _loadUserData() async {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // 🔹 صورة الملف الشخصي
             Stack(
               children: [
                 CircleAvatar(
@@ -202,7 +195,6 @@ Future<void> _loadUserData() async {
 
             SizedBox(height: 20),
 
-            // 🔹 معلومات المستخدم الأساسية
             Text(
               _userData?['full_name'] ?? widget.userName ?? 'مستخدم',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -217,7 +209,6 @@ Future<void> _loadUserData() async {
 
             SizedBox(height: 30),
 
-            // 🔹 معلومات الجهاز (إذا كان موجوداً)
             if (widget.userDevice != null) ...[
               _buildSectionTitle('معلومات الجهاز'),
               Card(
@@ -291,7 +282,6 @@ Future<void> _loadUserData() async {
               SizedBox(height: 20),
             ],
 
-            // 🔹 معلومات الحساب الشخصية
             _buildSectionTitle('معلومات الحساب'),
             _buildInfoCard(
               'الاسم الكامل',
@@ -334,7 +324,6 @@ Future<void> _loadUserData() async {
 
             SizedBox(height: 30),
 
-            // 🔹 الإعدادات
             _buildSectionTitle('الإعدادات'),
             Card(
               elevation: 3,
@@ -395,7 +384,6 @@ Future<void> _loadUserData() async {
 
             SizedBox(height: 30),
 
-            // 🔹 زر تسجيل الخروج
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
@@ -457,7 +445,6 @@ Future<void> _loadUserData() async {
 
             SizedBox(height: 20),
 
-            // 🔹 معلومات التطبيق
             Container(
               padding: EdgeInsets.all(15),
               decoration: BoxDecoration(

@@ -79,7 +79,6 @@ class _RecommendationsScreenState extends State<RecommendationsScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // فئات التوصيات
         Container(
           height: 60,
           child: ListView.builder(

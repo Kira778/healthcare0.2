@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../main_layout.dart';
 import 'register_screen.dart';
-import '../home/home_screen.dart'; // ⭐️ استيراد HomeScreen
+import '../home/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -23,12 +23,10 @@ class _LoginScreenState extends State<LoginScreen> {
       final email = emailController.text.trim();
       final password = passwordController.text.trim();
 
-      // التحقق البسيط
       if (email.isEmpty || password.isEmpty) {
         throw 'الرجاء ملء جميع الحقول';
       }
 
-      // البحث في profiles
       final response = await Supabase.instance.client
           .from('profiles')
           .select()
@@ -40,16 +38,14 @@ class _LoginScreenState extends State<LoginScreen> {
         throw 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
       }
 
-      // ⭐️ استخراج بيانات المستخدم
       final userName = response['full_name'] as String?;
       final userEmail = response['email'] as String;
 
-      // ⭐️ الانتقال للشاشة الرئيسية مع إرسال الإيميل
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => MainLayout(
-            userEmail: userEmail, // ⭐️ إرسال الإيميل
+            userEmail: userEmail, 
             userName: userName,
           ),
         ),

@@ -14,7 +14,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final fullNameController = TextEditingController();
   final phoneController = TextEditingController();
   final serialNumberController = TextEditingController();
-  final ageController = TextEditingController(); // ⭐ حقل السن الجديد
+  final ageController = TextEditingController();
 
   bool loading = false;
   bool passwordsMatch = true;
@@ -22,7 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool obscureConfirmPassword = true;
   String? serialNumberError;
   bool isSerialValid = false;
-  String? genderValue; // ⭐ اختياري: حقل النوع
+  String? genderValue; 
   final List<String> genderOptions = ['ذكر', 'أنثى', 'أخرى'];
 
   Future<void> _checkSerialNumber() async {
@@ -111,7 +111,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // ⭐ التحقق من السن
     final ageText = ageController.text.trim();
     if (ageText.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -189,15 +188,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final userId = authResponse.user!.id;
       final deviceId = deviceCheck['id'] as String;
 
-      // ⭐ إضافة حقل age في البيانات المرسلة
       await Supabase.instance.client.from('profiles').insert({
         'id': userId,
         'email': email,
         'passwords': password,
         'full_name': fullName,
         'phone': phone.isNotEmpty ? phone : null,
-        'age': age, // ⭐ حفظ السن
-        'gender': genderValue, // ⭐ اختياري: حفظ النوع
+        'age': age,
+        'gender': genderValue,
         'serial_number': serialBigInt,
         'device_id': deviceId,
         'created_at': DateTime.now().toIso8601String(),
@@ -290,7 +288,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 20),
 
-            // 🔹 حقل السيريال
             TextField(
               controller: serialNumberController,
               decoration: InputDecoration(
@@ -341,7 +338,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 20),
 
-            // 🔹 حقل الاسم الكامل
             TextField(
               controller: fullNameController,
               decoration: InputDecoration(
@@ -355,7 +351,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 15),
 
-            // 🔹 حقل السن (الجديد)
             TextField(
               controller: ageController,
               decoration: InputDecoration(
@@ -371,7 +366,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 15),
 
-            // 🔹 حقل النوع (اختياري - يمكن إزالته)
             DropdownButtonFormField<String>(
               value: genderValue,
               decoration: InputDecoration(
@@ -397,7 +391,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 15),
 
-            // 🔹 حقل الإيميل
             TextField(
               controller: emailController,
               decoration: InputDecoration(
@@ -412,7 +405,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 15),
 
-            // 🔹 حقل الهاتف
             TextField(
               controller: phoneController,
               decoration: InputDecoration(
@@ -427,7 +419,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 15),
 
-            // 🔹 حقل كلمة المرور
             TextField(
               controller: passwordController,
               obscureText: obscurePassword,
@@ -453,7 +444,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 15),
 
-            // 🔹 حقل تأكيد كلمة المرور
             TextField(
               controller: confirmPasswordController,
               obscureText: obscureConfirmPassword,
@@ -481,7 +471,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 30),
 
-            // 🔹 زر التسجيل
             SizedBox(
               width: double.infinity,
               height: 55,
@@ -512,7 +501,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
             SizedBox(height: 15),
 
-            // 🔹 رابط تسجيل الدخول
             Center(
               child: TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -523,7 +511,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
             ),
 
-            // 🔹 معلومات مهمة
             Container(
               margin: EdgeInsets.only(top: 25),
               padding: EdgeInsets.all(15),

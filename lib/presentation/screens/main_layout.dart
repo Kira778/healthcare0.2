@@ -4,18 +4,18 @@ import 'home/home_screen.dart';
 import 'notifications/notifications_screen.dart';
 import 'recommendations/recommendations_screen.dart';
 import 'profile/profile_screen.dart';
-import '../../ai/chat_screen.dart'; // عدل المسار حسب مشروعك
+import '../../ai/chat_screen.dart'; 
 
 class MainLayout extends StatefulWidget {
   final Map<String, dynamic>? userDevice;
-  final String? userName; // ⭐ استقبال اسم المستخدم
-  final String userEmail; // ⭐ أضف هذا السطر
+  final String? userName; 
+  final String userEmail; 
 
   const MainLayout({
     super.key,
     this.userDevice,
     this.userName,
-    required this.userEmail, // ⭐ أضف required
+    required this.userEmail,
   });
   @override
   State<MainLayout> createState() => _MainLayoutState();
@@ -25,26 +25,24 @@ class _MainLayoutState extends State<MainLayout> {
   int _selectedIndex = 0;
   final SupabaseClient _supabase = Supabase.instance.client;
 
-  // ⭐ قائمة الشاشات - سيتم تمرير البيانات لكل شاشة
   late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
 
-    // ⭐ تهيئة الشاشات مع تمرير البيانات المطلوبة
     _screens = [
       HomeScreen(
         userName: widget.userName,
         userDevice: widget.userDevice,
-        userEmail: widget.userEmail, // ⭐ تمرير الإيميل إلى HomeScreen
+        userEmail: widget.userEmail,
       ),
       NotificationsScreen(),
       RecommendationsScreen(),
       ProfileScreen(
         userName: widget.userName,
         userDevice: widget.userDevice,
-        userEmail: widget.userEmail, // ⭐ إذا احتاج
+        userEmail: widget.userEmail,
       ),
     ];
   }
@@ -100,7 +98,6 @@ class _MainLayoutState extends State<MainLayout> {
         ],
       ),
 
-      // 🔥 زر AI العالمي
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: const Color.fromARGB(255, 178, 171, 189),
         icon: const Icon(Icons.smart_toy),
