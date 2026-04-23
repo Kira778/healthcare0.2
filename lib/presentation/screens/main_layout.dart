@@ -4,12 +4,12 @@ import 'home/home_screen.dart';
 import 'notifications/notifications_screen.dart';
 import 'recommendations/recommendations_screen.dart';
 import 'profile/profile_screen.dart';
-import '../../ai/chat_screen.dart'; 
+import '../../ai/chat_screen.dart';
 
 class MainLayout extends StatefulWidget {
   final Map<String, dynamic>? userDevice;
-  final String? userName; 
-  final String userEmail; 
+  final String? userName;
+  final String userEmail;
 
   const MainLayout({
     super.key,

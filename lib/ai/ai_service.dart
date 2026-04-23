@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AIService {
-
+final String _apiKey = "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"; // ضع مفتاحك هنا
+  final String _model = "moonshotai/Kimi-K2-Instruct-0905";
   Future<String> getChatResponse(String message) async {
     final url = Uri.parse("https://router.huggingface.co/v1/chat/completions");
     final response = await http.post(
